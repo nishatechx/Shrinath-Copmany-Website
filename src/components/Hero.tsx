@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowRight } from 'lucide-react';
 import { motion } from 'motion/react';
 import { WebGLCanvasBackground } from './WebGLCanvasBackground';
+import { ClientsMarquee } from './ClientsMarquee';
 import { useSiteContent } from '../context/SiteContentContext';
 
 interface HeroProps {
@@ -23,7 +24,7 @@ export const Hero: React.FC<HeroProps> = ({
     <section
       id="home"
       style={{ perspective: 1400 }}
-      className="relative w-full min-h-[85vh] lg:min-h-[90vh] pt-24 pb-12 sm:pt-28 sm:pb-16 lg:pt-32 lg:pb-20 text-white flex flex-col justify-center overflow-hidden bg-slate-950"
+      className="relative w-full min-h-[90vh] lg:min-h-screen pt-24 sm:pt-28 lg:pt-32 pb-0 text-white flex flex-col justify-between overflow-hidden bg-slate-950"
     >
       {/* Full Background Image Layer - Edge-to-Edge Perfect Fit */}
       <div className="absolute inset-0 select-none pointer-events-none z-0">
@@ -34,27 +35,16 @@ export const Hero: React.FC<HeroProps> = ({
           className="w-full h-full object-cover object-center"
           referrerPolicy="no-referrer"
         />
+        {/* Cinematic gradient vignette */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-slate-950/40 to-slate-950/95" />
       </div>
 
       {/* WebGL Ambient Particle Matrix */}
       <WebGLCanvasBackground variant="hero" particleCount={40} className="z-[2] opacity-75" />
 
       {/* Hero Content Over Image with 3D Matrix Perspective Entrance */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10 my-auto py-6 sm:py-10">
         <div className="max-w-2xl lg:max-w-3xl flex flex-col items-start space-y-6">
-
-          {/* High-Tech Status Pill with 3D Flip */}
-          <motion.div
-            initial={{ opacity: 0, y: -20, rotateX: 25, filter: 'blur(6px)' }}
-            animate={{ opacity: 1, y: 0, rotateX: 0, filter: 'blur(0px)' }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-slate-700/80 backdrop-blur-md text-xs font-mono text-slate-200 shadow-lg"
-          >
-            <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse shadow-[0_0_8px_#38bdf8]" />
-            <span className="text-[11px] sm:text-xs text-sky-300 font-semibold tracking-wide">
-              {heroData.badgeText || 'SYSTEM ONLINE // NEXT-GEN IT SOLUTIONS'}
-            </span>
-          </motion.div>
 
           {/* Main Headline with 3D Depth Entrance */}
           <motion.h1
@@ -111,6 +101,16 @@ export const Hero: React.FC<HeroProps> = ({
 
         </div>
       </div>
+
+      {/* Trusted By Client Logos Marquee - Overlaid on the hero section image at the bottom below CTA buttons */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full relative z-10"
+      >
+        <ClientsMarquee />
+      </motion.div>
     </section>
   );
 };

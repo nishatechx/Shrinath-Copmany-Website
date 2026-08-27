@@ -1611,7 +1611,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onCloseToSite }) => {
                       type="password"
                       value={oldPassword}
                       onChange={(e) => setOldPassword(e.target.value)}
-                      placeholder="Enter current password (default: admin)"
+                      placeholder="Enter current password"
                       className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs sm:text-sm"
                       required
                     />

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Logo } from './Logo';
 import { SERVICES, COMPANY_CONTACT } from '../data/content';
-import { MapPin, Phone, Mail, Globe } from 'lucide-react';
+import { MapPin, Phone, Mail, Globe, Lock, ShieldCheck } from 'lucide-react';
 import { ServiceItem } from '../types';
 import { useSiteContent } from '../context/SiteContentContext';
 
@@ -9,14 +9,16 @@ interface FooterProps {
   onOpenContact: (servicePrefill?: string) => void;
   onSelectService: (service: ServiceItem) => void;
   onOpenPrivacyModal: () => void;
+  onOpenAdminLogin: () => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({
   onOpenContact,
   onSelectService,
   onOpenPrivacyModal,
+  onOpenAdminLogin,
 }) => {
-  const { content } = useSiteContent();
+  const { content, isAdminLoggedIn } = useSiteContent();
   const currentServices = content.services?.length ? content.services : SERVICES;
   const currentContact = content.company || COMPANY_CONTACT;
 
@@ -198,6 +200,20 @@ export const Footer: React.FC<FooterProps> = ({
               className="hover:text-slate-300 transition-colors cursor-pointer"
             >
               Terms & Conditions
+            </button>
+            <span>|</span>
+            {/* Encrypted Admin Login Icon */}
+            <button
+              id="encrypted-admin-login-btn"
+              onClick={onOpenAdminLogin}
+              title={isAdminLoggedIn ? "Encrypted Admin Panel (Active)" : "Encrypted System Login"}
+              className="p-1 rounded-md text-slate-500 hover:text-blue-400 hover:bg-slate-900 border border-slate-800/80 hover:border-blue-500/50 transition-all cursor-pointer inline-flex items-center gap-1 group"
+              aria-label="Encrypted System Login"
+            >
+              <Lock className="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-400 transition-colors" />
+              {isAdminLoggedIn && (
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_#10b981]" />
+              )}
             </button>
           </div>
         </div>

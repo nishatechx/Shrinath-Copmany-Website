@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { TESTIMONIALS } from '../data/content';
-import { Star, Quote, MessageSquareQuote, CheckCircle2, MapPin } from 'lucide-react';
+import { Star, Quote, MessageSquareQuote, CheckCircle2, MapPin, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import { WebGLSectionReveal } from './WebGLSectionReveal';
 import { TiltCard3D } from './TiltCard3D';
 import { useSiteContent } from '../context/SiteContentContext';
@@ -8,6 +8,7 @@ import { useSiteContent } from '../context/SiteContentContext';
 export const TestimonialsSection: React.FC = () => {
   const { content } = useSiteContent();
   const currentTestimonials = content.testimonials?.length ? content.testimonials : TESTIMONIALS;
+  const [showAll, setShowAll] = useState(false);
   const [activeIdx, setActiveIdx] = useState(0);
 
   // Color accents for initials badges
@@ -17,7 +18,12 @@ export const TestimonialsSection: React.FC = () => {
     'from-indigo-600 to-blue-800 text-white shadow-indigo-500/25',
     'from-blue-700 to-sky-800 text-white shadow-blue-500/25',
     'from-violet-600 to-blue-700 text-white shadow-purple-500/25',
+    'from-emerald-600 to-teal-700 text-white shadow-emerald-500/25',
+    'from-amber-600 to-orange-700 text-white shadow-amber-500/25',
+    'from-cyan-600 to-blue-700 text-white shadow-cyan-500/25',
   ];
+
+  const displayedTestimonials = showAll ? currentTestimonials : currentTestimonials.slice(0, 6);
 
   return (
     <section id="testimonials" className="py-14 sm:py-16 lg:py-20 bg-slate-50 text-slate-900 relative overflow-hidden">
@@ -40,22 +46,25 @@ export const TestimonialsSection: React.FC = () => {
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
             What Our Clients Say
           </h2>
+          <p className="text-slate-600 text-sm sm:text-base max-w-lg mx-auto mb-3">
+            Real feedback from local business owners, academy directors, and healthcare professionals who trust Shrinath IT Solutions.
+          </p>
           <div className="w-12 h-1 bg-blue-600 rounded-full mx-auto" />
         </WebGLSectionReveal>
 
         {/* Testimonials Cards Grid with 3D Stagger & Tilt */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mb-10 perspective-1000">
-          {currentTestimonials.map((t, idx) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-10 perspective-1000">
+          {displayedTestimonials.map((t, idx) => (
             <WebGLSectionReveal
               key={t.id}
               preset="grid-stagger"
-              delay={idx * 0.1}
+              delay={(idx % 6) * 0.08}
               duration={0.65}
               className="h-full"
             >
               <TiltCard3D
                 id={`testimonial-card-${t.id}`}
-                maxTilt={6}
+                maxTilt={5}
                 scale={1.02}
                 onClick={() => setActiveIdx(idx)}
                 className="h-full"
@@ -84,7 +93,7 @@ export const TestimonialsSection: React.FC = () => {
                     </div>
 
                     {/* Quote Text */}
-                    <p className="text-slate-700 text-sm sm:text-base leading-relaxed mb-6 font-normal">
+                    <p className="text-slate-700 text-sm sm:text-[15px] leading-relaxed mb-6 font-normal">
                       "{t.quote}"
                     </p>
                   </div>
@@ -116,20 +125,19 @@ export const TestimonialsSection: React.FC = () => {
           ))}
         </div>
 
-        {/* Carousel Indicator Dots */}
-        <div className="flex items-center justify-center gap-2 pt-2">
-          {currentTestimonials.map((_, i) => (
+        {/* View All / Toggle Button if more than 6 testimonials */}
+        {currentTestimonials.length > 6 && (
+          <div className="flex justify-center pt-2 pb-4">
             <button
-              key={i}
-              id={`testimonial-dot-${i}`}
-              onClick={() => setActiveIdx(i)}
-              className={`h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
-                activeIdx === i ? 'w-8 bg-blue-600' : 'w-2.5 bg-slate-300 hover:bg-slate-400'
-              }`}
-              aria-label={`Go to testimonial ${i + 1}`}
-            />
-          ))}
-        </div>
+              id="toggle-all-testimonials-btn"
+              onClick={() => setShowAll(!showAll)}
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-sm font-semibold shadow-sm hover:shadow transition-all duration-200 cursor-pointer"
+            >
+              <Sparkles className="w-4 h-4 text-blue-600" />
+              <span>{showAll ? 'Show Fewer Reviews' : `View All Reviews (${currentTestimonials.length})`}</span>
+            </button>
+          </div>
+        )}
 
       </div>
     </section>

@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Logo } from './Logo';
 import { NAV_ITEMS } from '../data/content';
-import { ArrowRight, Menu, X, Lock } from 'lucide-react';
-import { useSiteContent } from '../context/SiteContentContext';
+import { ArrowRight, Menu, X } from 'lucide-react';
 
 interface NavbarProps {
   onOpenContact: (servicePrefill?: string) => void;
-  onOpenAdminLogin: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenContact, onOpenAdminLogin }) => {
-  const { isAdminLoggedIn } = useSiteContent();
+export const Navbar: React.FC<NavbarProps> = ({ onOpenContact }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
@@ -97,23 +94,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContact, onOpenAdminLogin 
             })}
           </nav>
 
-          {/* CTA & Login Buttons Desktop */}
+          {/* CTA Button Desktop */}
           <div className="hidden md:flex items-center gap-3">
-            {/* Login button near Get in touch */}
-            <button
-              id="header-login-btn"
-              onClick={onOpenAdminLogin}
-              title="Admin Login & CMS"
-              className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold border transition-all duration-200 cursor-pointer ${
-                isAdminLoggedIn
-                  ? 'bg-blue-950/60 border-blue-500 text-blue-300 hover:bg-blue-900/60 shadow-[0_0_12px_rgba(59,130,246,0.3)]'
-                  : 'bg-slate-900/90 border-slate-700 text-slate-300 hover:text-white hover:border-slate-500 hover:bg-slate-800'
-              }`}
-            >
-              <Lock className="w-3.5 h-3.5 text-blue-400" />
-              <span>{isAdminLoggedIn ? 'Admin Panel' : 'Login'}</span>
-            </button>
-
             {/* Get in Touch Button */}
             <button
               id="header-get-in-touch-btn"
@@ -127,15 +109,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContact, onOpenAdminLogin 
 
           {/* Mobile Menu Trigger */}
           <div className="flex md:hidden items-center gap-2">
-            <button
-              onClick={onOpenAdminLogin}
-              className="px-2.5 py-1.5 rounded-lg text-slate-300 hover:text-white bg-slate-900 border border-slate-800 text-xs font-medium flex items-center gap-1.5"
-              aria-label="Admin Login"
-            >
-              <Lock className="w-3.5 h-3.5 text-blue-400" />
-              <span>Login</span>
-            </button>
-
             <button
               id="mobile-menu-toggle-btn"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -188,17 +161,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContact, onOpenAdminLogin 
             >
               <span>Get in Touch</span>
               <ArrowRight className="w-4 h-4" />
-            </button>
-
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                onOpenAdminLogin();
-              }}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-full bg-slate-900 hover:bg-slate-800 text-slate-300 font-medium text-xs border border-slate-800 cursor-pointer transition-all"
-            >
-              <Lock className="w-3.5 h-3.5 text-blue-400" />
-              <span>{isAdminLoggedIn ? 'Open Admin CMS Panel' : 'Admin CMS Login (/admin)'}</span>
             </button>
           </div>
         </div>

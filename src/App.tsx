@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
-import { ClientsMarquee } from './components/ClientsMarquee';
 import { ServicesSection } from './components/ServicesSection';
 import { AboutSection } from './components/AboutSection';
 import { ProcessSection } from './components/ProcessSection';
@@ -107,19 +106,15 @@ export default function App() {
       {/* 1. Header Navigation Bar */}
       <Navbar
         onOpenContact={() => handleOpenContact()}
-        onOpenAdminLogin={handleOpenAdmin}
       />
 
       {/* Main Content Sections */}
       <main className="flex-grow">
-        {/* 2. Hero Section */}
+        {/* 2. Hero Section (Includes embedded Trusted By marquee over background) */}
         <Hero
           onExploreServices={() => scrollTo('services')}
           onOpenContact={() => handleOpenContact()}
         />
-
-        {/* Client Logos Marquee */}
-        <ClientsMarquee />
 
         {/* 3. Services Section (Light Theme) */}
         <ServicesSection
@@ -141,11 +136,12 @@ export default function App() {
         <CtaBanner onOpenContact={() => handleOpenContact()} />
       </main>
 
-      {/* 8. Footer Section (4 Columns + Contact Info) */}
+      {/* 8. Footer Section (4 Columns + Contact Info + Encrypted Admin Login Icon) */}
       <Footer
         onOpenContact={handleOpenContact}
         onSelectService={(service) => setSelectedService(service)}
         onOpenPrivacyModal={() => setIsPrivacyModalOpen(true)}
+        onOpenAdminLogin={handleOpenAdmin}
       />
 
       {/* Modals */}

@@ -10,8 +10,7 @@ import {
   ProcessStep,
   StatItem,
 } from '../types';
-import { SERVICES, ABOUT_STATS, PROCESS_STEPS, TESTIMONIALS, COMPANY_CONTACT } from '../data/content';
-import { CLIENT_LOGOS } from '../components/ClientsMarquee';
+import { SERVICES, ABOUT_STATS, PROCESS_STEPS, TESTIMONIALS, COMPANY_CONTACT, CLIENT_LOGOS } from '../data/content';
 
 const DEFAULT_HERO: HeroContentInfo = {
   badgeText: 'SYSTEM ONLINE // NEXT-GEN IT SOLUTIONS',
@@ -64,10 +63,10 @@ const INITIAL_CONTENT: SiteContentState = {
   processSteps: PROCESS_STEPS,
 };
 
-const STORAGE_KEY = 'shrinath_site_content_v1';
+const STORAGE_KEY = 'shrinath_site_content_v2';
 const AUTH_STORAGE_KEY = 'shrinath_admin_auth_v1';
-const PASS_STORAGE_KEY = 'shrinath_admin_password_v1';
-const DEFAULT_PASSWORD = 'admin';
+const PASS_STORAGE_KEY = 'shrinath_admin_password_v2';
+const DEFAULT_PASSWORD = 'Shrinath@8975';
 
 interface SiteContentContextType {
   content: SiteContentState;
@@ -106,7 +105,7 @@ const SiteContentContext = createContext<SiteContentContextType | undefined>(und
 export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [content, setContent] = useState<SiteContentState>(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('shrinath_site_content_v1');
       if (saved) {
         const parsed = JSON.parse(saved);
         return {
@@ -115,7 +114,7 @@ export const SiteContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
           about: { ...DEFAULT_ABOUT, ...parsed.about },
           services: parsed.services?.length ? parsed.services : SERVICES,
           clientLogos: parsed.clientLogos?.length ? parsed.clientLogos : CLIENT_LOGOS,
-          testimonials: parsed.testimonials?.length ? parsed.testimonials : TESTIMONIALS,
+          testimonials: parsed.testimonials && parsed.testimonials.length >= 6 ? parsed.testimonials : TESTIMONIALS,
           processSteps: parsed.processSteps?.length ? parsed.processSteps : PROCESS_STEPS,
         };
       }

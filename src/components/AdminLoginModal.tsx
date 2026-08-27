@@ -29,7 +29,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ isOpen, onClos
         setPassword('');
         onSuccess();
       } else {
-        setError('Incorrect admin password. Default password is: admin');
+        setError('Incorrect admin password.');
       }
     }, 250);
   };
@@ -81,7 +81,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ isOpen, onClos
                   setPassword(e.target.value);
                   if (error) setError('');
                 }}
-                placeholder="Enter password (default: admin)"
+                placeholder="Enter admin password"
                 className="w-full px-4 py-3 bg-slate-950/90 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-11 text-sm font-medium"
                 autoFocus
                 required
@@ -96,7 +96,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ isOpen, onClos
               </button>
             </div>
             <div className="mt-1.5 flex items-center justify-between text-[11px] text-slate-400">
-              <span>Default password: <strong className="text-sky-400 font-mono">admin</strong></span>
+              <span>Secure encrypted authorization</span>
             </div>
           </div>
 
