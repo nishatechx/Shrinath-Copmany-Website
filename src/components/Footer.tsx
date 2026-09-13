@@ -1,220 +1,303 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Logo } from './Logo';
-import { SERVICES, COMPANY_CONTACT } from '../data/content';
-import { MapPin, Phone, Mail, Globe, Lock, ShieldCheck } from 'lucide-react';
-import { ServiceItem } from '../types';
-import { useSiteContent } from '../context/SiteContentContext';
+import { MapPin, Phone, Mail, Instagram, Facebook, Youtube, Linkedin, MessageCircle, ArrowUp, Globe } from 'lucide-react';
+import { motion, useInView } from 'motion/react';
+import { PREMIUM_EASE, useMotionSettings } from '../hooks/useMotionConfig';
 
 interface FooterProps {
-  onOpenContact: (servicePrefill?: string) => void;
-  onSelectService: (service: ServiceItem) => void;
-  onOpenPrivacyModal: () => void;
-  onOpenAdminLogin: () => void;
+  onOpenPrivacy?: () => void;
+  onOpenTerms?: () => void;
+  onOpenContact?: () => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({
+  onOpenPrivacy,
+  onOpenTerms,
   onOpenContact,
-  onSelectService,
-  onOpenPrivacyModal,
-  onOpenAdminLogin,
 }) => {
-  const { content, isAdminLoggedIn } = useSiteContent();
-  const currentServices = content.services?.length ? content.services : SERVICES;
-  const currentContact = content.company || COMPANY_CONTACT;
+  const footerRef = useRef<HTMLElement>(null);
+  const isInView = useInView(footerRef, { once: true, margin: '-40px' });
+  const { reducedMotion } = useMotionSettings();
 
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+  const scrollTo = (e: React.MouseEvent, id: string) => {
     e.preventDefault();
-    const targetId = href.replace('#', '');
-    const element = document.getElementById(targetId);
+    if (id === 'contact' && onOpenContact) {
+      onOpenContact();
+      return;
+    }
+    const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const socialLinks = [
+    {
+      name: 'WhatsApp',
+      icon: MessageCircle,
+      url: 'https://wa.me/917972865688?text=Hello%20Shrinath%20IT%20Solutions',
+    },
+    {
+      name: 'Instagram',
+      icon: Instagram,
+      url: 'https://instagram.com',
+    },
+    {
+      name: 'Facebook',
+      icon: Facebook,
+      url: 'https://facebook.com',
+    },
+    {
+      name: 'YouTube',
+      icon: Youtube,
+      url: 'https://youtube.com',
+    },
+    {
+      name: 'LinkedIn',
+      icon: Linkedin,
+      url: 'https://linkedin.com',
+    },
+  ];
+
   return (
-    <footer id="contact" className="bg-[#040711] text-slate-300 pt-32 pb-12 border-t border-slate-900 relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <footer ref={footerRef} className="bg-[#0b0e14] text-slate-400 text-sm border-t border-slate-800/80 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         
-        {/* 4-Column Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8 pb-16 border-b border-slate-800/80">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10">
           
-          {/* Col 1: Brand Info & Socials */}
-          <div className="lg:col-span-4 space-y-5">
-            <a href="#home" onClick={(e) => handleNavClick(e, '#home')} className="inline-block">
-              <Logo size="xl" />
+          {/* Column 1: Brand & Socials (4 cols) */}
+          <motion.div
+            initial={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.55, delay: 0, ease: PREMIUM_EASE }}
+            className="lg:col-span-4 flex flex-col space-y-4"
+          >
+            <a href="#home" onClick={(e) => scrollTo(e, 'home')} className="inline-block transition-transform hover:scale-105 duration-200">
+              <Logo size="lg" />
             </a>
-            
-            <p className="text-slate-400 text-sm leading-relaxed max-w-sm">
-              We build digital solutions that help businesses grow, scale and succeed in the digital world.
+
+            <p className="text-sm text-slate-300 font-medium">
+              Your Growth. Our Digital Expertise.
             </p>
 
-            {/* Social Icons (Facebook, LinkedIn, Instagram, Twitter) */}
-            <div className="flex items-center gap-3 pt-2">
-              {/* Facebook */}
-              <a
-                href={currentContact.facebook || "https://facebook.com"}
-                target="_blank"
-                rel="noreferrer"
-                id="social-fb"
-                aria-label="Facebook"
-                className="w-9 h-9 rounded-full bg-slate-900 hover:bg-blue-600 text-slate-300 hover:text-white border border-slate-800 flex items-center justify-center transition-all duration-200"
-              >
-                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                </svg>
-              </a>
-
-              {/* LinkedIn */}
-              <a
-                href={currentContact.linkedin || "https://linkedin.com"}
-                target="_blank"
-                rel="noreferrer"
-                id="social-li"
-                aria-label="LinkedIn"
-                className="w-9 h-9 rounded-full bg-slate-900 hover:bg-blue-600 text-slate-300 hover:text-white border border-slate-800 flex items-center justify-center transition-all duration-200"
-              >
-                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                  <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                </svg>
-              </a>
-
-              {/* Instagram */}
-              <a
-                href={currentContact.instagram || "https://instagram.com"}
-                target="_blank"
-                rel="noreferrer"
-                id="social-ig"
-                aria-label="Instagram"
-                className="w-9 h-9 rounded-full bg-slate-900 hover:bg-pink-600 text-slate-300 hover:text-white border border-slate-800 flex items-center justify-center transition-all duration-200"
-              >
-                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                </svg>
-              </a>
-
-              {/* Twitter / X */}
-              <a
-                href={currentContact.twitter || "https://twitter.com"}
-                target="_blank"
-                rel="noreferrer"
-                id="social-tw"
-                aria-label="Twitter"
-                className="w-9 h-9 rounded-full bg-slate-900 hover:bg-sky-500 text-slate-300 hover:text-white border border-slate-800 flex items-center justify-center transition-all duration-200"
-              >
-                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                </svg>
-              </a>
+            {/* Social Icons with smooth 3px lift */}
+            <div className="flex items-center space-x-3 pt-2">
+              {socialLinks.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <motion.a
+                    key={item.name}
+                    href={item.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={item.name}
+                    whileHover={{ y: -3, scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="w-9 h-9 rounded-full bg-slate-900 hover:bg-[#EAB308] text-slate-300 hover:text-slate-950 flex items-center justify-center border border-slate-800 transition-colors duration-200"
+                  >
+                    <Icon className="w-4 h-4" />
+                  </motion.a>
+                );
+              })}
             </div>
-          </div>
+          </motion.div>
 
-          {/* Col 2: Quick Links */}
-          <div className="lg:col-span-2 space-y-4">
-            <h4 className="text-white font-bold text-base tracking-tight">Quick Links</h4>
-            <ul className="space-y-2.5 text-sm">
+          {/* Column 2: Quick Links (2 cols) */}
+          <motion.div
+            initial={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.55, delay: 0.06, ease: PREMIUM_EASE }}
+            className="lg:col-span-2"
+          >
+            <h3 className="font-bold text-white text-base mb-4 tracking-tight">
+              Quick Links
+            </h3>
+            <ul className="space-y-2.5">
+              {[
+                { label: 'Home', target: 'home' },
+                { label: 'About Us', target: 'about' },
+                { label: 'Services', target: 'services' },
+                { label: 'Our Work', target: 'portfolio' },
+              ].map((link) => (
+                <li key={link.label}>
+                  <a
+                    href={`#${link.target}`}
+                    onClick={(e) => scrollTo(e, link.target)}
+                    className="inline-block hover:text-[#EAB308] hover:translate-x-1 transition-all duration-200"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
               <li>
-                <a href="#home" onClick={(e) => handleNavClick(e, '#home')} className="text-slate-400 hover:text-blue-400 transition-colors">
-                  Home
-                </a>
-              </li>
-              <li>
-                <a href="#about" onClick={(e) => handleNavClick(e, '#about')} className="text-slate-400 hover:text-blue-400 transition-colors">
-                  About Us
-                </a>
-              </li>
-              <li>
-                <a href="#services" onClick={(e) => handleNavClick(e, '#services')} className="text-slate-400 hover:text-blue-400 transition-colors">
-                  Services
-                </a>
-              </li>
-              <li>
-                <button onClick={() => onOpenContact()} className="text-slate-400 hover:text-blue-400 transition-colors cursor-pointer text-left">
+                <button
+                  onClick={onOpenContact}
+                  className="inline-block hover:text-[#EAB308] hover:translate-x-1 transition-all duration-200 cursor-pointer text-left"
+                >
                   Contact
                 </button>
               </li>
             </ul>
-          </div>
+          </motion.div>
 
-          {/* Col 3: Services */}
-          <div className="lg:col-span-3 space-y-4">
-            <h4 className="text-white font-bold text-base tracking-tight">Services</h4>
-            <ul className="space-y-2.5 text-sm">
-              {currentServices.map((s) => (
-                <li key={s.id}>
-                  <button
-                    onClick={() => onSelectService(s)}
-                    className="text-slate-400 hover:text-blue-400 transition-colors text-left cursor-pointer"
+          {/* Column 3: Our Services (3 cols) */}
+          <motion.div
+            initial={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.55, delay: 0.12, ease: PREMIUM_EASE }}
+            className="lg:col-span-3"
+          >
+            <h3 className="font-bold text-white text-base mb-4 tracking-tight">
+              Our Services
+            </h3>
+            <ul className="space-y-2.5">
+              {[
+                'Website Development',
+                'Digital Marketing',
+                'Mobile App Development',
+                'Logo & Branding',
+                'Content Creation',
+                'Domain & Hosting',
+                'IT Consultation',
+              ].map((serviceName) => (
+                <li key={serviceName}>
+                  <a
+                    href="#services"
+                    onClick={(e) => scrollTo(e, 'services')}
+                    className="inline-block hover:text-[#EAB308] hover:translate-x-1 transition-all duration-200"
                   >
-                    {s.title}
-                  </button>
+                    {serviceName}
+                  </a>
                 </li>
               ))}
             </ul>
-          </div>
+          </motion.div>
 
-          {/* Col 4: Contact Us */}
-          <div className="lg:col-span-3 space-y-4">
-            <h4 className="text-white font-bold text-base tracking-tight">Contact Us</h4>
-            <ul className="space-y-3.5 text-sm">
-              <li className="flex items-start gap-3">
-                <MapPin className="w-4 h-4 text-blue-500 shrink-0 mt-1" />
-                <span className="text-slate-400 leading-snug">{currentContact.address}</span>
-              </li>
-              <li className="flex items-center gap-3">
-                <Phone className="w-4 h-4 text-blue-500 shrink-0" />
-                <a href={`tel:${currentContact.phone}`} className="text-slate-400 hover:text-blue-400 transition-colors">
-                  {currentContact.phone}
-                </a>
-              </li>
-              <li className="flex items-center gap-3">
-                <Mail className="w-4 h-4 text-blue-500 shrink-0" />
-                <a href={`mailto:${currentContact.email}`} className="text-slate-400 hover:text-blue-400 transition-colors">
-                  {currentContact.email}
-                </a>
-              </li>
-              <li className="flex items-center gap-3">
-                <Globe className="w-4 h-4 text-blue-500 shrink-0" />
-                <a href={`https://${currentContact.website}`} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-blue-400 transition-colors">
-                  {currentContact.website}
-                </a>
-              </li>
-            </ul>
-          </div>
+          {/* Column 4: Get In Touch & Maharashtra/Washim Map graphic (3 cols) */}
+          <motion.div
+            initial={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.55, delay: 0.18, ease: PREMIUM_EASE }}
+            className="lg:col-span-3 flex flex-col justify-between"
+          >
+            <div>
+              <h3 className="font-bold text-white text-base mb-4 tracking-tight">
+                Get In Touch
+              </h3>
+              <div className="space-y-3">
+                <div className="flex items-start space-x-3">
+                  <MapPin className="w-4 h-4 text-[#EAB308] flex-shrink-0 mt-1" />
+                  <span className="text-slate-300 leading-snug">
+                    SIS, Near Circuit House, <br />
+                    Civil Lines, Washim 444505 <br />
+                    Maharashtra, India
+                  </span>
+                </div>
+
+                <div className="flex items-center space-x-3">
+                  <Phone className="w-4 h-4 text-[#EAB308] flex-shrink-0" />
+                  <a
+                    href="tel:+917972865688"
+                    className="text-slate-300 hover:text-[#EAB308] transition-colors font-medium"
+                  >
+                    +91 79728 65688
+                  </a>
+                </div>
+
+                <div className="flex items-center space-x-3">
+                  <Globe className="w-4 h-4 text-[#EAB308] flex-shrink-0" />
+                  <a
+                    href="https://shrinathit.in"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-slate-300 hover:text-[#EAB308] transition-colors font-medium"
+                  >
+                    shrinathit.in
+                  </a>
+                </div>
+
+                <div className="flex items-center space-x-3">
+                  <Mail className="w-4 h-4 text-[#EAB308] flex-shrink-0" />
+                  <a
+                    href="mailto:info@shrinathit.in"
+                    className="text-slate-300 hover:text-[#EAB308] transition-colors break-all"
+                  >
+                    info@shrinathit.in
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Map Silhouette & Proudly Serving Washim Graphic */}
+            <div className="mt-6 p-4 rounded-xl bg-slate-900/80 border border-slate-800/80 flex items-center space-x-4">
+              {/* Stylized Maharashtra / Washim District Outline */}
+              <div className="relative w-14 h-14 flex-shrink-0">
+                <svg
+                  viewBox="0 0 100 100"
+                  className="w-full h-full text-slate-700 fill-current opacity-80"
+                >
+                  <path d="M 20,30 Q 35,15 65,20 T 90,45 Q 85,75 60,85 T 25,80 Q 15,60 20,30 Z" />
+                  <path d="M 45,45 Q 55,40 65,48 T 58,62 Q 48,60 45,45 Z" fill="#334155" />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <MapPin className="w-5 h-5 text-[#EAB308] fill-[#EAB308] drop-shadow-md" />
+                </div>
+              </div>
+
+              <div>
+                <p className="text-xs font-semibold text-slate-400">Proudly Serving</p>
+                <p className="text-sm font-extrabold text-white">Washim</p>
+                <p className="text-[11px] text-slate-400">and Nearby Areas</p>
+              </div>
+            </div>
+
+          </motion.div>
 
         </div>
 
-        {/* Bottom Bar */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <p>© {new Date().getFullYear()} {currentContact.name || 'Shrinath IT Solutions'}. All Rights Reserved.</p>
-          
-          <div className="flex items-center gap-4">
+        {/* Bottom Sub-footer with Back to top button */}
+        <div className="mt-14 pt-6 border-t border-slate-800/80 flex flex-col md:flex-row items-center justify-between text-xs text-slate-400 gap-4">
+          <div>
+            © 2025 Shrinath IT Solutions. All Rights Reserved.
+          </div>
+
+          <div className="flex items-center space-x-4">
             <button
-              onClick={onOpenPrivacyModal}
-              className="hover:text-slate-300 transition-colors cursor-pointer"
+              onClick={onOpenPrivacy}
+              className="hover:text-slate-200 transition-colors cursor-pointer"
             >
               Privacy Policy
             </button>
             <span>|</span>
             <button
-              onClick={onOpenPrivacyModal}
-              className="hover:text-slate-300 transition-colors cursor-pointer"
+              onClick={onOpenTerms}
+              className="hover:text-slate-200 transition-colors cursor-pointer"
             >
               Terms & Conditions
             </button>
             <span>|</span>
-            {/* Encrypted Admin Login Icon */}
-            <button
-              id="encrypted-admin-login-btn"
-              onClick={onOpenAdminLogin}
-              title={isAdminLoggedIn ? "Encrypted Admin Panel (Active)" : "Encrypted System Login"}
-              className="p-1 rounded-md text-slate-500 hover:text-blue-400 hover:bg-slate-900 border border-slate-800/80 hover:border-blue-500/50 transition-all cursor-pointer inline-flex items-center gap-1 group"
-              aria-label="Encrypted System Login"
+            <span className="hover:text-slate-200 transition-colors cursor-pointer">
+              Sitemap
+            </span>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <span>
+              Made with <span className="text-red-500">❤️</span> in Washim
+            </span>
+            <motion.button
+              onClick={scrollToTop}
+              whileHover={{ y: -2, scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              aria-label="Back to top"
+              className="p-1.5 rounded-lg bg-slate-900 hover:bg-[#EAB308] hover:text-slate-950 border border-slate-800 transition-colors cursor-pointer"
             >
-              <Lock className="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-400 transition-colors" />
-              {isAdminLoggedIn && (
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_#10b981]" />
-              )}
-            </button>
+              <ArrowUp className="w-3.5 h-3.5" />
+            </motion.button>
           </div>
         </div>
 
@@ -222,4 +305,3 @@ export const Footer: React.FC<FooterProps> = ({
     </footer>
   );
 };
-

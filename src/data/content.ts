@@ -1,4 +1,4 @@
-import { NavItem, ServiceItem, StatItem, ProjectItem, ProcessStep, TestimonialItem, ClientLogoItem } from '../types';
+import { NavItem, ServiceItem, StatItem, ProjectItem, ProcessStep, TestimonialItem, ClientLogoItem, CompanyContactInfo } from '../types';
 
 export const NAV_ITEMS: NavItem[] = [
   { label: 'Home', href: '#home' },
@@ -341,10 +341,16 @@ export const TESTIMONIALS: TestimonialItem[] = [
   },
 ];
 
-export const COMPANY_CONTACT = {
-  address: 'Civil Line, Washim, Maharashtra',
-  phone: '+91 97636 58462',
-  whatsapp: '9763658462',
+export const COMPANY_CONTACT: CompanyContactInfo = {
+  name: 'Shrinath IT Solutions',
+  tagline: 'Digital Solutions That Drive Growth',
+  address: 'SIS, Near Circuit House, Civil Lines, Washim 444505 Maharshtra.',
+  phone: '+91 79728 65688',
+  whatsapp: '7972865688',
   email: 'info@shrinathit.in',
   website: 'shrinathit.in',
+  facebookUrl: 'https://facebook.com',
+  linkedinUrl: 'https://linkedin.com',
+  instagramUrl: 'https://instagram.com',
+  twitterUrl: 'https://twitter.com',
 };

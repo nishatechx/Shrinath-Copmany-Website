@@ -1,154 +1,144 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
-import { ServicesSection } from './components/ServicesSection';
+import { TrustedBySection } from './components/TrustedBySection';
+import { StatsBar } from './components/StatsBar';
+import { ServicesSection, ServiceData, SERVICES_LIST } from './components/ServicesSection';
 import { AboutSection } from './components/AboutSection';
-import { ProcessSection } from './components/ProcessSection';
+import { WorkSection, ProjectData } from './components/WorkSection';
 import { TestimonialsSection } from './components/TestimonialsSection';
 import { CtaBanner } from './components/CtaBanner';
 import { Footer } from './components/Footer';
+import { ScrollSectionReveal } from './components/ScrollSectionReveal';
 
-// Admin CMS & Modals
-import { AdminPanel } from './components/AdminPanel';
-import { AdminLoginModal } from './components/AdminLoginModal';
+// Modals
 import { ContactModal } from './components/ContactModal';
 import { ServiceModal } from './components/ServiceModal';
+import { ProjectModal } from './components/ProjectModal';
 import { AboutModal } from './components/AboutModal';
 import { PrivacyModal } from './components/PrivacyModal';
 import { WhatsAppFloatingButton } from './components/WhatsAppFloatingButton';
 import { BackToTopButton } from './components/BackToTopButton';
-
-// Types, Data & Context
-import { ServiceItem } from './types';
-import { useSiteContent } from './context/SiteContentContext';
+import { CustomCursor } from './components/CustomCursor';
+import { ScrollProgressBar } from './components/ScrollProgressBar';
 
 export default function App() {
-  const { isAdminLoggedIn } = useSiteContent();
+  // Modal states
+  const [isConsultationOpen, setIsConsultationOpen] = useState(false);
+  const [consultationServicePrefill, setConsultationServicePrefill] = useState('');
+  const [consultationTitle, setConsultationTitle] = useState('Get Free Consultation');
 
-  // State for modals and interaction
-  const [isContactOpen, setIsContactOpen] = useState(false);
-  const [contactServicePrefill, setContactServicePrefill] = useState('');
-  
-  const [selectedService, setSelectedService] = useState<ServiceItem | null>(null);
-  
-  const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
-  const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
+  const [selectedService, setSelectedService] = useState<ServiceData | null>(null);
+  const [selectedProject, setSelectedProject] = useState<ProjectData | null>(null);
 
-  // Admin CMS State
-  const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
-  const [isAdminLoginModalOpen, setIsAdminLoginModalOpen] = useState(false);
+  const [isAboutOpen, setIsAboutOpen] = useState(false);
+  const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
 
-  // URL route listener for /admin or #admin
-  useEffect(() => {
-    const checkAdminRoute = () => {
-      const isRouteAdmin = 
-        window.location.pathname === '/admin' || 
-        window.location.pathname.endsWith('/admin') || 
-        window.location.hash === '#admin' ||
-        window.location.hash === '#/admin';
+  // Handlers
+  const handleOpenConsultation = (serviceTitle?: string, customTitle?: string) => {
+    if (serviceTitle) {
+      setConsultationServicePrefill(serviceTitle);
+    }
+    setConsultationTitle(customTitle || 'Get Free Consultation');
+    setIsConsultationOpen(true);
+  };
 
-      if (isRouteAdmin) {
-        if (isAdminLoggedIn) {
-          setIsAdminPanelOpen(true);
-          setIsAdminLoginModalOpen(false);
-        } else {
-          setIsAdminLoginModalOpen(true);
-        }
-      }
-    };
+  const handleSelectService = (service: ServiceData) => {
+    setSelectedService(service);
+  };
 
-    checkAdminRoute();
-    window.addEventListener('hashchange', checkAdminRoute);
-    window.addEventListener('popstate', checkAdminRoute);
-    return () => {
-      window.removeEventListener('hashchange', checkAdminRoute);
-      window.removeEventListener('popstate', checkAdminRoute);
-    };
-  }, [isAdminLoggedIn]);
+  const handleSelectProject = (project: ProjectData) => {
+    setSelectedProject(project);
+  };
 
-  // Smooth scroll helper
-  const scrollTo = (id: string) => {
-    const el = document.getElementById(id);
+  const handleScrollToWork = () => {
+    const el = document.getElementById('portfolio');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
-  const handleOpenContact = (servicePrefill?: string) => {
-    if (servicePrefill) {
-      setContactServicePrefill(servicePrefill);
-    }
-    setIsContactOpen(true);
-  };
-
-  const handleOpenAdmin = () => {
-    if (isAdminLoggedIn) {
-      setIsAdminPanelOpen(true);
-    } else {
-      setIsAdminLoginModalOpen(true);
-    }
-  };
-
-  const handleCloseAdminPanel = () => {
-    setIsAdminPanelOpen(false);
-    if (window.location.hash === '#admin' || window.location.hash === '#/admin') {
-      window.history.pushState(null, '', window.location.pathname);
-    }
-  };
-
-  // If Admin Panel is full screen open and user is authorized
-  if (isAdminPanelOpen && isAdminLoggedIn) {
-    return <AdminPanel onCloseToSite={handleCloseAdminPanel} />;
-  }
-
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-blue-600 selection:text-white">
-      {/* 1. Header Navigation Bar */}
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-[#FFD21F] selection:text-[#17191C]">
+      {/* Slim Fixed Progress Bar at top of page */}
+      <ScrollProgressBar />
+
+      {/* Interactive Gradient Mouse Cursor (Dark: #17191C, Yellow: #FFD21F) */}
+      <CustomCursor />
+
+      {/* 1. Top Navbar */}
       <Navbar
-        onOpenContact={() => handleOpenContact()}
+        onOpenConsultation={() => handleOpenConsultation(undefined, 'Get Free Consultation')}
+        onOpenContact={() => handleOpenConsultation(undefined, 'Contact Our Team')}
       />
 
-      {/* Main Content Sections */}
+      {/* Main Page Layout */}
       <main className="flex-grow">
-        {/* 2. Hero Section (Includes embedded Trusted By marquee over background) */}
+        {/* 2. Hero Section */}
         <Hero
-          onExploreServices={() => scrollTo('services')}
-          onOpenContact={() => handleOpenContact()}
+          onStartProject={() => handleOpenConsultation(undefined, 'Start Your Project')}
+          onViewWork={handleScrollToWork}
         />
 
-        {/* 3. Services Section (Light Theme) */}
-        <ServicesSection
-          onSelectService={(service) => setSelectedService(service)}
-        />
+        {/* Client Logos / Trusted By Scroll Section */}
+        <TrustedBySection />
 
-        {/* 4. About Us Section (Dark Theme with 2x2 Stats) */}
-        <AboutSection
-          onOpenAboutModal={() => setIsAboutModalOpen(true)}
-        />
+        {/* 3. Metrics / Stats Bar */}
+        <StatsBar />
 
-        {/* 5. Our Process Section (Dark Theme 4-Step Flow) */}
-        <ProcessSection />
+        {/* 4. Our Services Section */}
+        <ScrollSectionReveal id="services-section">
+          <ServicesSection
+            onSelectService={handleSelectService}
+            onViewAllServices={() => handleOpenConsultation(SERVICES_LIST[0].title, 'Explore All Digital Services')}
+          />
+        </ScrollSectionReveal>
 
-        {/* 6. Testimonials Section (Light Theme 3 Cards) */}
-        <TestimonialsSection />
+        {/* 5. About Us Section */}
+        <ScrollSectionReveal id="about-section">
+          <AboutSection onKnowMore={() => setIsAboutOpen(true)} />
+        </ScrollSectionReveal>
 
-        {/* 7. Call To Action Banner (Curved Dark Card) */}
-        <CtaBanner onOpenContact={() => handleOpenContact()} />
+        {/* 6. Our Work / Recent Projects Section */}
+        <ScrollSectionReveal id="work-section">
+          <WorkSection onSelectProject={handleSelectProject} />
+        </ScrollSectionReveal>
+
+        {/* 7. Testimonials Section */}
+        <ScrollSectionReveal id="testimonials-section">
+          <TestimonialsSection />
+        </ScrollSectionReveal>
+
+        {/* 8. Call to Action Banner */}
+        <ScrollSectionReveal id="cta-section">
+          <CtaBanner
+            onOpenConsultation={() => handleOpenConsultation(undefined, 'Claim Your Free Consultation')}
+          />
+        </ScrollSectionReveal>
       </main>
 
-      {/* 8. Footer Section (4 Columns + Contact Info + Encrypted Admin Login Icon) */}
-      <Footer
-        onOpenContact={handleOpenContact}
-        onSelectService={(service) => setSelectedService(service)}
-        onOpenPrivacyModal={() => setIsPrivacyModalOpen(true)}
-        onOpenAdminLogin={handleOpenAdmin}
+      {/* 9. Footer */}
+      <ScrollSectionReveal id="footer-section">
+        <Footer
+          onOpenPrivacy={() => setIsPrivacyOpen(true)}
+          onOpenTerms={() => setIsPrivacyOpen(true)}
+          onOpenContact={() => handleOpenConsultation(undefined, 'Get In Touch')}
+        />
+      </ScrollSectionReveal>
+
+      {/* Floating Action Buttons */}
+      <BackToTopButton scrollThreshold={500} />
+      <WhatsAppFloatingButton
+        onOpenContact={() => handleOpenConsultation(undefined, 'WhatsApp Priority Inquiry')}
+        phoneNumber="7972865688"
       />
 
-      {/* Modals */}
+      {/* Interactive Modals */}
       <ContactModal
-        isOpen={isContactOpen}
-        onClose={() => setIsContactOpen(false)}
-        initialService={contactServicePrefill}
+        isOpen={isConsultationOpen}
+        onClose={() => setIsConsultationOpen(false)}
+        initialService={consultationServicePrefill}
+        title={consultationTitle}
       />
 
       <ServiceModal
@@ -156,40 +146,32 @@ export default function App() {
         onClose={() => setSelectedService(null)}
         onSelectForQuote={(serviceTitle) => {
           setSelectedService(null);
-          handleOpenContact(serviceTitle);
+          handleOpenConsultation(serviceTitle, `Inquire: ${serviceTitle}`);
+        }}
+      />
+
+      <ProjectModal
+        project={selectedProject}
+        onClose={() => setSelectedProject(null)}
+        onDiscussSimilar={(projectName) => {
+          setSelectedProject(null);
+          handleOpenConsultation(undefined, `Build Similar: ${projectName}`);
         }}
       />
 
       <AboutModal
-        isOpen={isAboutModalOpen}
-        onClose={() => setIsAboutModalOpen(false)}
-        onOpenContact={() => handleOpenContact()}
-      />
-
-      <PrivacyModal
-        isOpen={isPrivacyModalOpen}
-        onClose={() => setIsPrivacyModalOpen(false)}
-      />
-
-      {/* Admin Login Modal */}
-      <AdminLoginModal
-        isOpen={isAdminLoginModalOpen}
-        onClose={() => setIsAdminLoginModalOpen(false)}
-        onSuccess={() => {
-          setIsAdminLoginModalOpen(false);
-          setIsAdminPanelOpen(true);
+        isOpen={isAboutOpen}
+        onClose={() => setIsAboutOpen(false)}
+        onOpenConsultation={() => {
+          setIsAboutOpen(false);
+          handleOpenConsultation(undefined, 'Start a Project with Us');
         }}
       />
 
-      {/* Floating WhatsApp Contact Button */}
-      <WhatsAppFloatingButton
-        onOpenContact={() => handleOpenContact()}
-        phoneNumber="9763658462"
+      <PrivacyModal
+        isOpen={isPrivacyOpen}
+        onClose={() => setIsPrivacyOpen(false)}
       />
-
-      {/* Floating Back To Top Button */}
-      <BackToTopButton scrollThreshold={350} />
     </div>
   );
 }
-

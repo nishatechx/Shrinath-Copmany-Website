@@ -86,7 +86,7 @@ export const TiltCard3D: React.FC<TiltCard3DProps> = ({
         {/* Specular glare reflection */}
         {glare && (
           <div
-            className="absolute inset-0 pointer-events-none rounded-inherit overflow-hidden transition-opacity duration-300"
+            className="absolute inset-0 pointer-events-none rounded-2xl overflow-hidden transition-opacity duration-300"
             style={{
               opacity: glarePos.opacity,
               background: `radial-gradient(circle at ${glarePos.x}% ${glarePos.y}%, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 65%)`,

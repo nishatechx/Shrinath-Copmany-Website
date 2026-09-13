@@ -1,160 +1,200 @@
-import React from 'react';
-import { ABOUT_STATS } from '../data/content';
-import { CheckCircle2, ArrowRight, Compass, Smile, UserCheck, Award, Sparkles, ShieldCheck } from 'lucide-react';
-import { StatItem } from '../types';
-import { motion } from 'motion/react';
-import { AnimatedCounter } from './AnimatedCounter';
-import { WebGLSectionReveal } from './WebGLSectionReveal';
-import { TiltCard3D } from './TiltCard3D';
-import { useSiteContent } from '../context/SiteContentContext';
+import React, { useRef } from 'react';
+import { ArrowRight, MapPin, Headphones, TrendingUp, Receipt, Handshake } from 'lucide-react';
+import { motion, useInView, useScroll, useTransform } from 'motion/react';
+import { PREMIUM_EASE, useMotionSettings } from '../hooks/useMotionConfig';
 
 interface AboutSectionProps {
-  onOpenAboutModal: () => void;
+  onKnowMore: () => void;
 }
 
-export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenAboutModal }) => {
-  const { content } = useSiteContent();
-  const aboutData = content.about;
-  const currentStats = aboutData.stats?.length ? aboutData.stats : ABOUT_STATS;
-  const bullets = aboutData.bullets?.length
-    ? aboutData.bullets
-    : [
-        'Client-focused approach & dedicated engineering',
-        'Innovative, scalable & cost-effective architecture',
-        'On-time delivery, 99.9% uptime & 24/7 technical support',
-      ];
+export const AboutSection: React.FC<AboutSectionProps> = ({ onKnowMore }) => {
+  const sectionRef = useRef<HTMLElement>(null);
+  const imageContainerRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(sectionRef, { once: true, margin: '-60px' });
+  const { allowParallax, reducedMotion } = useMotionSettings();
 
-  const getStatIcon = (iconName: StatItem['iconName']) => {
-    switch (iconName) {
-      case 'folder-git':
-        return <Compass className="w-6 h-6 text-sky-400" />;
-      case 'smile':
-        return <Smile className="w-6 h-6 text-blue-400" />;
-      case 'clock':
-        return <UserCheck className="w-6 h-6 text-sky-400" />;
-      case 'award':
-        return <Award className="w-6 h-6 text-blue-400" />;
-      default:
-        return <Sparkles className="w-6 h-6 text-blue-400" />;
-    }
-  };
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start end', 'end start'],
+  });
+
+  const imageParallax = useTransform(scrollYProgress, [0, 1], [-12, allowParallax ? 12 : 0]);
+
+  const valueProps = [
+    {
+      icon: MapPin,
+      title: 'Local Understanding',
+      desc: 'Rooted in Washim, we understand local market dynamics, customer behavior and regional growth opportunities.',
+    },
+    {
+      icon: Headphones,
+      title: 'Personalized Support',
+      desc: 'Direct WhatsApp and phone assistance with fast turnaround times and no ticketing bureaucracy.',
+    },
+    {
+      icon: TrendingUp,
+      title: 'Result-Oriented Approach',
+      desc: 'We focus on measurable outcomes — inquiries, sales, and digital reach that drive real revenue.',
+    },
+    {
+      icon: Receipt,
+      title: 'Affordable & Transparent',
+      desc: 'Clear upfront pricing with no hidden charges, crafted specifically for local businesses and startups.',
+    },
+    {
+      icon: Handshake,
+      title: 'Long-Term Partnership',
+      desc: 'We stand by your side from initial launch through continuous digital upgrades and scaling.',
+    },
+  ];
 
   return (
-    <section id="about" className="py-14 sm:py-16 lg:py-20 bg-slate-950 text-white relative overflow-hidden">
-      {/* Subtle background glow */}
-      <div className="absolute top-1/2 left-0 w-96 h-96 bg-blue-600/10 rounded-full blur-[100px] pointer-events-none -z-10" />
+    <section ref={sectionRef} id="about" className="py-20 bg-white border-b border-slate-200 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Pill Badge */}
+        <motion.div
+          initial={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.5, ease: PREMIUM_EASE }}
+          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EAB308] text-slate-950 text-xs font-extrabold uppercase tracking-wider mb-6"
+        >
+          <span className="w-2 h-2 rounded-full bg-slate-950"></span>
+          ABOUT US
+        </motion.div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+        {/* 3-Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
           
-          {/* Left Column: About Copy with 3D Split-Left Reveal */}
-          <WebGLSectionReveal preset="split-left" duration={0.8} className="lg:col-span-6 space-y-6">
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-950/70 border border-blue-800/60 mb-2">
-                <ShieldCheck className="w-3.5 h-3.5 text-sky-400" />
-                <span className="text-sky-400 text-xs font-bold tracking-widest uppercase">
-                  {aboutData.badgeText || 'ENTERPRISE-GRADE EXPERTISE'}
+          {/* Column 1: Heading line-by-line, Paragraph, CTA (4 cols) */}
+          <div className="lg:col-span-4 flex flex-col items-start">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight leading-tight mb-5">
+              <span className="block overflow-hidden py-0.5">
+                <motion.span
+                  initial={reducedMotion ? { opacity: 0 } : { y: 28, opacity: 0 }}
+                  animate={isInView ? { y: 0, opacity: 1 } : {}}
+                  transition={{ duration: 0.55, delay: 0.1, ease: PREMIUM_EASE }}
+                  className="block"
+                >
+                  Local Business.
+                </motion.span>
+              </span>
+              <span className="block overflow-hidden py-0.5">
+                <motion.span
+                  initial={reducedMotion ? { opacity: 0 } : { y: 28, opacity: 0 }}
+                  animate={isInView ? { y: 0, opacity: 1 } : {}}
+                  transition={{ duration: 0.55, delay: 0.2, ease: PREMIUM_EASE }}
+                  className="block text-[#D97706]"
+                >
+                  Global Opportunities.
+                </motion.span>
+              </span>
+            </h2>
+
+            <motion.p
+              initial={reducedMotion ? { opacity: 0 } : { y: 20, opacity: 0 }}
+              animate={isInView ? { y: 0, opacity: 1 } : {}}
+              transition={{ duration: 0.55, delay: 0.32, ease: PREMIUM_EASE }}
+              className="text-sm sm:text-base text-slate-600 leading-relaxed mb-8"
+            >
+              Shrinath IT Solutions is a Washim-based IT company passionate about helping
+              local businesses, startups and entrepreneurs grow online. We provide reliable,
+              affordable and result-driven digital solutions that make your business stand out
+              in today's competitive world.
+            </motion.p>
+
+            <motion.button
+              onClick={onKnowMore}
+              id="about-know-more-btn"
+              initial={reducedMotion ? { opacity: 0 } : { y: 18, opacity: 0 }}
+              animate={isInView ? { y: 0, opacity: 1 } : {}}
+              transition={{ duration: 0.5, delay: 0.42, ease: PREMIUM_EASE }}
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.98 }}
+              className="group relative inline-flex items-center justify-center px-6 py-3.5 rounded-xl bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 hover:from-amber-300 hover:via-amber-400 hover:to-orange-400 text-slate-950 font-extrabold text-sm shadow-md shadow-amber-500/30 hover:shadow-lg hover:shadow-orange-500/40 transition-all cursor-pointer overflow-hidden"
+            >
+              <span className="relative z-10">Know More About Us</span>
+              <ArrowRight className="relative z-10 w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-1.5" />
+              <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-transparent to-black/10 opacity-70 group-hover:opacity-100 pointer-events-none" />
+            </motion.button>
+          </div>
+
+          {/* Column 2: Office Reception Image with clip-path bottom-to-top reveal + scroll parallax (4 cols) */}
+          <div ref={imageContainerRef} className="lg:col-span-4 flex justify-center items-center">
+            <motion.div
+              style={{ y: imageParallax }}
+              initial={
+                reducedMotion
+                  ? { opacity: 0 }
+                  : { clipPath: 'inset(100% 0% 0% 0%)', opacity: 0.2, scale: 1.04 }
+              }
+              animate={
+                isInView
+                  ? { clipPath: 'inset(0% 0% 0% 0%)', opacity: 1, scale: 1 }
+                  : {}
+              }
+              transition={{ duration: 0.85, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              className="relative w-full rounded-2xl overflow-hidden shadow-2xl border border-slate-200 group will-change-transform bg-slate-900"
+            >
+              {/* Shrinath IT Solutions Office photo - Perfectly fitted with no overlaying logo */}
+              <img
+                src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjGmCWlZEiUzZVni2yurwmYKgSB51SuitfcFgf1C-H3fSQvtnk4lKR46L7V_PQiHiLLeFwcIGhFCRuujiDoJAL95aGkfM4rwv94D_OcKpUbI0EN8Tfkotfqn6gK_4N8WoEOaeHNeZQr9zLDleXgYIfHlCyCkXO_T7NpRRUMHcygJx_uNNv8GGGIV8lG5mw/s1600/Shrinath%20IT%20Solutions%20Office.png"
+                alt="Shrinath IT Solutions Office - SIS, Near Circuit House, Civil Lines, Washim"
+                className="w-full h-auto aspect-[4/3] sm:aspect-[16/11] object-cover object-center filter brightness-95 group-hover:scale-103 transition-transform duration-700"
+                referrerPolicy="no-referrer"
+              />
+
+              {/* Bottom Location Badge */}
+              <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-slate-950/85 via-slate-950/40 to-transparent flex items-end p-4">
+                <span className="text-[11px] sm:text-xs font-semibold text-slate-100 flex items-center gap-1.5 drop-shadow-sm">
+                  <MapPin className="w-3.5 h-3.5 text-[#EAB308] flex-shrink-0" />
+                  <span>SIS, Near Circuit House, Civil Lines, Washim</span>
                 </span>
               </div>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
-                {aboutData.headline || 'Your Strategic Partner For'} <br />
-                <span className="text-gradient-blue">{aboutData.headlineGradient || 'Digital Success'}</span>
-              </h2>
-            </div>
+            </motion.div>
+          </div>
 
-            <p className="text-slate-300 text-base leading-relaxed">
-              {aboutData.paragraph}
-            </p>
-
-            {/* Checklist */}
-            <div className="space-y-3 pt-2">
-              {bullets.map((bullet, idx) => (
-                <motion.div 
-                  key={idx} 
-                  initial={{ opacity: 0, x: -15 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.1 * idx, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                  className="flex items-center gap-3"
-                >
-                  <div className="w-5 h-5 rounded-full bg-blue-500/20 border border-blue-400/40 flex items-center justify-center shrink-0">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-sky-400" />
-                  </div>
-                  <span className="text-slate-200 text-sm font-medium">
-                    {bullet}
-                  </span>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* CTA Button */}
-            <div className="pt-4">
-              <button
-                id="about-know-more-btn"
-                onClick={onOpenAboutModal}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm shadow-lg shadow-blue-600/30 hover:shadow-blue-600/50 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
-              >
-                <span>Know More About Us</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          </WebGLSectionReveal>
-
-          {/* Right Column: 2x2 Stats Grid with Staggered 3D Tilt Cards */}
-          <div className="lg:col-span-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 perspective-1000">
-              {currentStats.map((stat, idx) => (
-                <WebGLSectionReveal
+          {/* Column 3: 5 Value Points with Staggered Entrance (4 cols) */}
+          <div className="lg:col-span-4 flex flex-col space-y-5">
+            {valueProps.map((item, idx) => {
+              const Icon = item.icon;
+              return (
+                <motion.div
                   key={idx}
-                  preset="grid-stagger"
-                  delay={idx * 0.1}
-                  duration={0.65}
+                  initial={reducedMotion ? { opacity: 0 } : { opacity: 0, x: 20 }}
+                  animate={isInView ? { opacity: 1, x: 0 } : {}}
+                  transition={{
+                    duration: 0.5,
+                    delay: 0.35 + idx * 0.08, // 80ms stagger
+                    ease: PREMIUM_EASE,
+                  }}
+                  className="flex items-center space-x-3.5 group cursor-default"
                 >
-                  <TiltCard3D
-                    id={`stat-card-${idx}`}
-                    maxTilt={8}
-                    scale={1.03}
-                    className="h-full"
+                  <motion.div
+                    initial={reducedMotion ? { scale: 1 } : { scale: 0.8 }}
+                    animate={isInView ? { scale: 1 } : {}}
+                    transition={{
+                      duration: 0.45,
+                      delay: 0.35 + idx * 0.08 + 0.05,
+                      ease: PREMIUM_EASE,
+                    }}
+                    className="flex-shrink-0 w-10 h-10 rounded-lg bg-amber-50 group-hover:bg-[#EAB308] border border-amber-200 group-hover:border-[#EAB308] flex items-center justify-center text-[#EAB308] group-hover:text-slate-950 transition-all duration-250 shadow-xs"
                   >
-                    <div className="h-full bg-slate-900/90 hover:bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-7 flex flex-col justify-between shadow-lg hover:shadow-blue-900/30 transition-all duration-300 group relative overflow-hidden">
-                      {/* Subtle top laser line */}
-                      <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-sky-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                      <div className="flex items-center justify-between mb-3">
-                        {/* Icon */}
-                        <div className="w-12 h-12 rounded-xl bg-blue-950/60 border border-blue-800/40 flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:border-blue-500/60 transition-all">
-                          {getStatIcon(stat.iconName)}
-                        </div>
-                        {/* Tech telemetry label */}
-                        <span className="font-mono text-[10px] text-slate-500 tracking-wider">
-                          STAT // 0{idx + 1}
-                        </span>
-                      </div>
-
-                      {/* Stat text */}
-                      <div>
-                        <div className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight group-hover:text-sky-300 transition-colors font-mono flex items-baseline">
-                          <AnimatedCounter
-                            value={stat.value}
-                            duration={2}
-                            delay={0.1 + idx * 0.12}
-                          />
-                        </div>
-                        <div className="text-slate-400 text-xs sm:text-sm font-medium mt-1">
-                          {stat.label}
-                        </div>
-                      </div>
-                    </div>
-                  </TiltCard3D>
-                </WebGLSectionReveal>
-              ))}
-            </div>
+                    <Icon className="w-5 h-5 transition-transform duration-250 group-hover:scale-110" />
+                  </motion.div>
+                  <div>
+                    <h4 className="text-base font-bold text-slate-900 group-hover:text-[#D97706] transition-colors duration-200">
+                      {item.title}
+                    </h4>
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
 
         </div>
+
       </div>
     </section>
   );
 };
-
-

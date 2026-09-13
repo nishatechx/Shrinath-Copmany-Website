@@ -98,5 +98,18 @@
   backface-visibility: hidden;
 }
 
+/* Bright Mouse Cursor Icon (Yellow #FFD21F with Dark #17191C outline) */
+@media (pointer: fine) {
+  body, a, button, input, textarea, select, [role="button"], .cursor-pointer {
+    cursor: none !important;
+  }
+}
+
+/* Fallback SVG Bright Mouse Pointer icon */
+.custom-bright-cursor,
+body {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M3 3l7.07 17.97 3.51-7.39 7.39-3.51L3 3z' fill='%23FFD21F' stroke='%2317191C' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E") 3 3, auto;
+}
+
 
 

@@ -5,6 +5,7 @@ import { ProcessStep } from '../types';
 import { motion } from 'motion/react';
 import { WebGLSectionReveal } from './WebGLSectionReveal';
 import { TiltCard3D } from './TiltCard3D';
+import { Interactive3DTechBackground } from './Interactive3DTechBackground';
 import { useSiteContent } from '../context/SiteContentContext';
 
 export const ProcessSection: React.FC = () => {
@@ -29,6 +30,16 @@ export const ProcessSection: React.FC = () => {
 
   return (
     <section id="process" className="py-14 sm:py-16 lg:py-20 bg-slate-950 text-white relative overflow-hidden">
+      {/* Interactive 3D Cyber Technology Matrix */}
+      <Interactive3DTechBackground
+        variant="matrix-grid"
+        theme="dark"
+        density="medium"
+        intensity={0.72}
+        interactive={true}
+        className="opacity-75"
+      />
+
       {/* Background glow */}
       <div className="absolute top-1/3 right-1/4 w-80 h-80 bg-blue-600/10 rounded-full blur-[100px] pointer-events-none -z-10" />
 

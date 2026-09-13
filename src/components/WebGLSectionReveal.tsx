@@ -7,6 +7,7 @@ export type WebGLRevealPreset =
   | 'split-right'
   | 'holo-expand'
   | 'grid-stagger'
+  | 'card-pop'
   | 'depth-lift';
 
 interface WebGLSectionRevealProps {
@@ -131,6 +132,27 @@ export const WebGLSectionReveal: React.FC<WebGLSectionRevealProps> = ({
             opacity: 1,
             y: 0,
             scale: 1,
+            filter: 'blur(0px)',
+            transition: {
+              duration,
+              delay,
+              ease: [0.16, 1, 0.3, 1],
+            },
+          },
+        };
+
+      case 'card-pop':
+        return {
+          hidden: {
+            opacity: 0,
+            scale: 0.9,
+            y: 20,
+            filter: 'blur(4px)',
+          },
+          visible: {
+            opacity: 1,
+            scale: 1,
+            y: 0,
             filter: 'blur(0px)',
             transition: {
               duration,
