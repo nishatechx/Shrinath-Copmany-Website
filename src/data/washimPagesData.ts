@@ -216,7 +216,7 @@ export const WASHIM_LANDING_PAGES: Record<string, WashimPageSEOData> = {
       },
       {
         question: 'Do you provide on-site meetings and technical support in Washim and nearby tehsils?',
-        answer: 'Yes! Our office is located at SIS, Near Circuit House, Civil Lines, Washim 444505 Maharshtra. Our engineering team provides direct face-to-face consultations in Washim city, and we also provide on-site field visits across Risod, Karanja Lad, Malegaon, Mangrulpir, Manora, and Shirpur Jain whenever needed.',
+        answer: 'Yes! Our office is located at SIS, Near Circuit House, Civil Lines, Washim 444505 Maharashtra, India. Our engineering team provides direct face-to-face consultations in Washim city, and we also provide on-site field visits across Risod, Karanja Lad, Malegaon, Mangrulpir, Manora, and Shirpur Jain whenever needed.',
       },
       {
         question: 'Is domain registration, SSL certificate, and hosting included in the package?',
@@ -785,7 +785,7 @@ export const WASHIM_LANDING_PAGES: Record<string, WashimPageSEOData> = {
       },
       {
         question: 'Can we meet locally in Washim to test the prototype on our phones?',
-        answer: 'Yes! We provide interactive test APK builds at every project milestone. You can meet our engineers in Washim at our office (SIS, Near Circuit House, Civil Lines, Washim 444505 Maharshtra.) or we can visit your premises so you can test and feel the real app live on your own smartphone.',
+        answer: 'Yes! We provide interactive test APK builds at every project milestone. You can meet our engineers in Washim at our office (SIS, Near Circuit House, Civil Lines, Washim 444505 Maharashtra, India) or we can visit your premises so you can test and feel the real app live on your own smartphone.',
       },
     ],
     schemaData: {

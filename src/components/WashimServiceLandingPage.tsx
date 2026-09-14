@@ -502,7 +502,7 @@ export const WashimServiceLandingPage: React.FC<WashimServiceLandingPageProps> =
                 <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-800 text-xs sm:text-sm space-y-2">
                   <div className="flex items-center gap-2 font-bold text-white">
                     <MapPin className="w-4 h-4 text-blue-500" />
-                    <span>Office Location: SIS, Near Circuit House, Civil Lines, Washim 444505 Maharshtra.</span>
+                    <span>Office Location: SIS, Near Circuit House, Civil Lines, Washim 444505 Maharashtra, India</span>
                   </div>
                   <p className="text-slate-400 pl-6">
                     Walk in anytime or book a free discovery meeting with our senior technical consultants.

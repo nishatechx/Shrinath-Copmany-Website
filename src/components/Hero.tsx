@@ -5,7 +5,8 @@ import { PREMIUM_EASE, useMotionSettings } from '../hooks/useMotionConfig';
 
 interface HeroProps {
   onStartProject: () => void;
-  onViewWork: () => void;
+  onExploreServices?: () => void;
+  onViewWork?: () => void;
 }
 
 interface RotatingService {
@@ -47,7 +48,7 @@ const ROTATING_SERVICES: RotatingService[] = [
   },
 ];
 
-export const Hero: React.FC<HeroProps> = ({ onStartProject, onViewWork }) => {
+export const Hero: React.FC<HeroProps> = ({ onStartProject, onExploreServices, onViewWork }) => {
   const { allowParallax, reducedMotion } = useMotionSettings();
   const heroRef = useRef<HTMLElement>(null);
   const [serviceIndex, setServiceIndex] = useState(0);
@@ -192,14 +193,14 @@ export const Hero: React.FC<HeroProps> = ({ onStartProject, onViewWork }) => {
               </motion.button>
 
               <motion.button
-                onClick={onViewWork}
-                id="hero-view-work-btn"
+                onClick={onExploreServices || onViewWork}
+                id="hero-explore-services-btn"
                 whileHover={{ y: -2 }}
                 whileTap={{ scale: 0.98 }}
                 className="group inline-flex items-center justify-center px-5 sm:px-6 py-3 sm:py-3.5 rounded-xl bg-gradient-to-r from-amber-50 via-white to-amber-50/80 hover:from-amber-100 hover:via-orange-50 hover:to-amber-100 text-slate-950 font-bold text-sm sm:text-base border-2 border-amber-400/90 hover:border-orange-500 shadow-md shadow-amber-500/15 hover:shadow-lg hover:shadow-amber-500/25 transition-all duration-300 cursor-pointer text-center"
               >
-                <Phone className="w-4 h-4 mr-2 text-[#D97706] flex-shrink-0 transition-transform duration-200 group-hover:rotate-12" />
-                <span>View Our Work</span>
+                <Globe className="w-4 h-4 mr-2 text-[#D97706] flex-shrink-0 transition-transform duration-200 group-hover:rotate-12" />
+                <span>Explore Services</span>
               </motion.button>
             </motion.div>
           </div>

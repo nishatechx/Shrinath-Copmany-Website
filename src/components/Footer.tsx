@@ -1,19 +1,24 @@
 import React, { useRef } from 'react';
 import { Logo } from './Logo';
-import { MapPin, Phone, Mail, Instagram, Facebook, Youtube, Linkedin, MessageCircle, ArrowUp, Globe } from 'lucide-react';
+import { MapPin, Phone, Mail, Instagram, Facebook, Youtube, Linkedin, MessageCircle, ArrowUp, Globe, Lock } from 'lucide-react';
 import { motion, useInView } from 'motion/react';
 import { PREMIUM_EASE, useMotionSettings } from '../hooks/useMotionConfig';
-
 interface FooterProps {
   onOpenPrivacy?: () => void;
   onOpenTerms?: () => void;
   onOpenContact?: () => void;
+  onNavigateTeam?: () => void;
+  onNavigateContact?: () => void;
+  onOpenLaunchManager?: () => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({
   onOpenPrivacy,
   onOpenTerms,
   onOpenContact,
+  onNavigateTeam,
+  onNavigateContact,
+  onOpenLaunchManager,
 }) => {
   const footerRef = useRef<HTMLElement>(null);
   const isInView = useInView(footerRef, { once: true, margin: '-40px' });
@@ -21,13 +26,39 @@ export const Footer: React.FC<FooterProps> = ({
 
   const scrollTo = (e: React.MouseEvent, id: string) => {
     e.preventDefault();
-    if (id === 'contact' && onOpenContact) {
-      onOpenContact();
+    if (id === 'team') {
+      if (onNavigateTeam) {
+        onNavigateTeam();
+        return;
+      }
+    }
+    if (id === 'contact') {
+      if (onNavigateContact) {
+        onNavigateContact();
+        return;
+      }
+      if (onOpenContact) {
+        onOpenContact();
+        return;
+      }
+    }
+
+    const cleanPath = id === 'home' ? '/' : `/${id}`;
+    window.history.pushState({ section: id }, '', cleanPath);
+
+    if (id === 'home') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
+
     const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      const offset = 80;
+      const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+      window.scrollTo({
+        top: elementPosition - offset,
+        behavior: 'smooth',
+      });
     }
   };
 
@@ -76,7 +107,7 @@ export const Footer: React.FC<FooterProps> = ({
             transition={{ duration: 0.55, delay: 0, ease: PREMIUM_EASE }}
             className="lg:col-span-4 flex flex-col space-y-4"
           >
-            <a href="#home" onClick={(e) => scrollTo(e, 'home')} className="inline-block transition-transform hover:scale-105 duration-200">
+            <a href="/" onClick={(e) => scrollTo(e, 'home')} className="inline-block transition-transform hover:scale-105 duration-200">
               <Logo size="lg" />
             </a>
 
@@ -121,11 +152,10 @@ export const Footer: React.FC<FooterProps> = ({
                 { label: 'Home', target: 'home' },
                 { label: 'About Us', target: 'about' },
                 { label: 'Services', target: 'services' },
-                { label: 'Our Work', target: 'portfolio' },
               ].map((link) => (
                 <li key={link.label}>
                   <a
-                    href={`#${link.target}`}
+                    href={link.target === 'home' ? '/' : `/${link.target}`}
                     onClick={(e) => scrollTo(e, link.target)}
                     className="inline-block hover:text-[#EAB308] hover:translate-x-1 transition-all duration-200"
                   >
@@ -134,12 +164,29 @@ export const Footer: React.FC<FooterProps> = ({
                 </li>
               ))}
               <li>
-                <button
-                  onClick={onOpenContact}
+                <a
+                  href="/team"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (onNavigateTeam) onNavigateTeam();
+                  }}
+                  className="inline-block hover:text-[#EAB308] hover:translate-x-1 transition-all duration-200 cursor-pointer text-left font-medium"
+                >
+                  Team
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/contact"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (onNavigateContact) onNavigateContact();
+                    else if (onOpenContact) onOpenContact();
+                  }}
                   className="inline-block hover:text-[#EAB308] hover:translate-x-1 transition-all duration-200 cursor-pointer text-left"
                 >
                   Contact
-                </button>
+                </a>
               </li>
             </ul>
           </motion.div>
@@ -166,7 +213,7 @@ export const Footer: React.FC<FooterProps> = ({
               ].map((serviceName) => (
                 <li key={serviceName}>
                   <a
-                    href="#services"
+                    href="/services"
                     onClick={(e) => scrollTo(e, 'services')}
                     className="inline-block hover:text-[#EAB308] hover:translate-x-1 transition-all duration-200"
                   >
@@ -223,10 +270,10 @@ export const Footer: React.FC<FooterProps> = ({
                 <div className="flex items-center space-x-3">
                   <Mail className="w-4 h-4 text-[#EAB308] flex-shrink-0" />
                   <a
-                    href="mailto:info@shrinathit.in"
+                    href="mailto:shrinathit.in@gmail.com"
                     className="text-slate-300 hover:text-[#EAB308] transition-colors break-all"
                   >
-                    info@shrinathit.in
+                    shrinathit.in@gmail.com
                   </a>
                 </div>
               </div>
@@ -283,6 +330,20 @@ export const Footer: React.FC<FooterProps> = ({
             <span className="hover:text-slate-200 transition-colors cursor-pointer">
               Sitemap
             </span>
+            {onOpenLaunchManager && (
+              <>
+                <span>|</span>
+                <button
+                  type="button"
+                  onClick={onOpenLaunchManager}
+                  title="Launch Settings (Alt + L)"
+                  className="text-slate-500 hover:text-amber-400 transition-colors cursor-pointer inline-flex items-center gap-1"
+                >
+                  <Lock className="w-3 h-3" />
+                  <span>Launch Portal (Alt+L)</span>
+                </button>
+              </>
+            )}
           </div>
 
           <div className="flex items-center gap-4">

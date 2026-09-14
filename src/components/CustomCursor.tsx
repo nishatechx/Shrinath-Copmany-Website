@@ -10,6 +10,7 @@ export const CustomCursor: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isClicking, setIsClicking] = useState(false);
+  const [isInsideModal, setIsInsideModal] = useState(false);
 
   // Direct mouse position motion values (instant tracking, 0 latency)
   const mouseX = useMotionValue(-100);
@@ -24,6 +25,15 @@ export const CustomCursor: React.FC = () => {
     const handleMouseMove = (e: MouseEvent) => {
       mouseX.set(e.clientX);
       mouseY.set(e.clientY);
+
+      const target = e.target as HTMLElement | null;
+      if (target) {
+        const inModalOrInput = target.closest(
+          '#launch-manager-modal, [role="dialog"], input, textarea, select, .modal-content'
+        );
+        setIsInsideModal(!!inModalOrInput);
+      }
+
       if (!isVisible) setIsVisible(true);
     };
 
@@ -37,6 +47,11 @@ export const CustomCursor: React.FC = () => {
     const handleMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement | null;
       if (!target) return;
+
+      const inModalOrInput = target.closest(
+        '#launch-manager-modal, [role="dialog"], input, textarea, select, .modal-content'
+      );
+      setIsInsideModal(!!inModalOrInput);
 
       const interactiveEl = target.closest(
         'a, button, input, textarea, select, [role="button"], .cursor-pointer, [data-cursor]'
@@ -69,8 +84,8 @@ export const CustomCursor: React.FC = () => {
 
   return (
     <div
-      className="pointer-events-none fixed inset-0 z-[99999] overflow-hidden transition-opacity duration-200"
-      style={{ opacity: isVisible ? 1 : 0 }}
+      className="pointer-events-none fixed inset-0 z-[100010] overflow-hidden transition-opacity duration-150"
+      style={{ opacity: isVisible && !isInsideModal ? 1 : 0 }}
       aria-hidden="true"
     >
       {/* Precision Mouse Pointer Icon (No Circles) */}

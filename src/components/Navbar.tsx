@@ -7,11 +7,15 @@ import { PREMIUM_EASE } from '../hooks/useMotionConfig';
 interface NavbarProps {
   onOpenConsultation: () => void;
   onOpenContact?: () => void;
+  onNavigateTeam?: () => void;
+  onNavigateContact?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   onOpenConsultation,
   onOpenContact,
+  onNavigateTeam,
+  onNavigateContact,
 }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -21,7 +25,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 15);
 
-      const sections = ['home', 'services', 'about', 'portfolio'];
+      const sections = ['home', 'services', 'about'];
       const scrollPosition = window.scrollY + 250;
 
       for (const sectionId of sections) {
@@ -41,11 +45,32 @@ export const Navbar: React.FC<NavbarProps> = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const getLinkHref = (id: string) => (id === 'home' ? '/' : `/${id}`);
+
   const scrollToSection = (e: React.MouseEvent, id: string) => {
     e.preventDefault();
     setMobileMenuOpen(false);
-    if (id === 'contact' && onOpenContact) {
-      onOpenContact();
+    if (id === 'team' && onNavigateTeam) {
+      onNavigateTeam();
+      return;
+    }
+    if (id === 'contact') {
+      if (onNavigateContact) {
+        onNavigateContact();
+        return;
+      }
+      if (onOpenContact) {
+        onOpenContact();
+        return;
+      }
+    }
+
+    const cleanPath = id === 'home' ? '/' : `/${id}`;
+    window.history.pushState({ section: id }, '', cleanPath);
+
+    if (id === 'home') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setActiveSection('home');
       return;
     }
 
@@ -65,7 +90,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     { label: 'Home', id: 'home' },
     { label: 'About', id: 'about' },
     { label: 'Services', id: 'services' },
-    { label: 'Portfolio', id: 'portfolio' },
+    { label: 'Team', id: 'team' },
     { label: 'Contact', id: 'contact' },
   ];
 
@@ -85,7 +110,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="flex items-center justify-between">
           {/* Brand Logo with subtle scale-in and hover glow */}
           <motion.a
-            href="#home"
+            href="/"
             onClick={(e) => scrollToSection(e, 'home')}
             initial={{ scale: 0.94, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -104,7 +129,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               return (
                 <motion.a
                   key={link.id}
-                  href={`#${link.id}`}
+                  href={getLinkHref(link.id)}
                   onClick={(e) => scrollToSection(e, link.id)}
                   initial={{ opacity: 0, y: -6 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -199,7 +224,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             {navLinks.map((link) => (
               <a
                 key={link.id}
-                href={`#${link.id}`}
+                href={getLinkHref(link.id)}
                 onClick={(e) => scrollToSection(e, link.id)}
                 className={`text-base font-medium px-3 py-2 rounded-md ${
                   activeSection === link.id

@@ -27,10 +27,10 @@ const DEFAULT_HERO: HeroContentInfo = {
 const DEFAULT_COMPANY: CompanyContactInfo = {
   name: 'Shrinath IT Solutions',
   tagline: 'Digital Solutions That Drive Growth',
-  address: 'SIS, Near Circuit House, Civil Lines, Washim 444505 Maharshtra.',
+  address: 'SIS, Near Circuit House, Civil Lines, Washim 444505 Maharashtra, India',
   phone: '+91 79728 65688',
   whatsapp: '7972865688',
-  email: 'info@shrinathit.in',
+  email: 'shrinathit.in@gmail.com',
   website: 'shrinathit.in',
   facebookUrl: 'https://facebook.com',
   linkedinUrl: 'https://linkedin.com',

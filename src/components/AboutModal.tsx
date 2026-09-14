@@ -116,7 +116,7 @@ export const AboutModal: React.FC<AboutModalProps> = ({
                 <MapPin className="w-5 h-5 text-[#EAB308] flex-shrink-0 mt-0.5" />
                 <div className="text-xs text-slate-300">
                   <strong className="text-white block text-sm">Corporate Office</strong>
-                  SIS, Near Circuit House, Civil Lines, Washim 444505 Maharshtra. <br />
+                  SIS, Near Circuit House, Civil Lines, Washim 444505 Maharashtra, India <br />
                   Direct Phone: <span className="text-[#EAB308] font-bold">+91 79728 65688</span>
                 </div>
               </div>

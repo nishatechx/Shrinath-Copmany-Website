@@ -1214,7 +1214,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onCloseToSite }) => {
                       type="email"
                       value={companyForm.email}
                       onChange={(e) => setCompanyForm({ ...companyForm, email: e.target.value })}
-                      placeholder="info@shrinathit.in"
+                      placeholder="shrinathit.in@gmail.com"
                       className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-sm focus:border-blue-500 focus:outline-none"
                       required
                     />

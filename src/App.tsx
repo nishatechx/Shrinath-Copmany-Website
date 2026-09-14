@@ -1,38 +1,194 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { TrustedBySection } from './components/TrustedBySection';
 import { StatsBar } from './components/StatsBar';
 import { ServicesSection, ServiceData, SERVICES_LIST } from './components/ServicesSection';
 import { AboutSection } from './components/AboutSection';
-import { WorkSection, ProjectData } from './components/WorkSection';
 import { TestimonialsSection } from './components/TestimonialsSection';
 import { CtaBanner } from './components/CtaBanner';
 import { Footer } from './components/Footer';
 import { ScrollSectionReveal } from './components/ScrollSectionReveal';
+import { TeamPage } from './components/TeamPage';
+import { ContactPage } from './components/ContactPage';
 
 // Modals
 import { ContactModal } from './components/ContactModal';
 import { ServiceModal } from './components/ServiceModal';
-import { ProjectModal } from './components/ProjectModal';
 import { AboutModal } from './components/AboutModal';
 import { PrivacyModal } from './components/PrivacyModal';
-import { WhatsAppFloatingButton } from './components/WhatsAppFloatingButton';
 import { BackToTopButton } from './components/BackToTopButton';
 import { CustomCursor } from './components/CustomCursor';
 import { ScrollProgressBar } from './components/ScrollProgressBar';
+import { LaunchCountdownOverlay } from './components/LaunchCountdownOverlay';
+import {
+  LaunchManagerModal,
+  LaunchSettings,
+  getSavedLaunchSettings,
+  LAUNCH_STORAGE_KEY,
+} from './components/LaunchManagerModal';
+import { normalizeImageUrl, DEFAULT_LAUNCH_IMAGE } from './utils/imageUrl';
 
 export default function App() {
+  // Launch management settings & state
+  const [launchSettings, setLaunchSettings] = useState<LaunchSettings>(() =>
+    getSavedLaunchSettings()
+  );
+  const [isLaunchManagerOpen, setIsLaunchManagerOpen] = useState<boolean>(false);
+  const [showLaunchPreview, setShowLaunchPreview] = useState<boolean>(false);
+  const [isLaunchSessionUnlocked, setIsLaunchSessionUnlocked] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return sessionStorage.getItem('shrinath_launch_unlocked') === 'true';
+    }
+    return false;
+  });
+
+  // Handler for updated launch settings ("make it happen")
+  const handleSettingsUpdated = (newSettings: LaunchSettings) => {
+    setLaunchSettings(newSettings);
+    if (newSettings.enabled) {
+      setIsLaunchSessionUnlocked(false);
+      try {
+        sessionStorage.removeItem('shrinath_launch_unlocked');
+      } catch {
+        // ignore storage restrictions
+      }
+    }
+  };
+
+  // Handler for updating dragged countdown position coordinates
+  const handleUpdateDragPosition = (pos: { x: number; y: number }) => {
+    setLaunchSettings((prev) => {
+      const updated: LaunchSettings = { ...prev, dragPosition: pos };
+      try {
+        localStorage.setItem(LAUNCH_STORAGE_KEY, JSON.stringify(updated));
+      } catch {
+        // ignore storage restrictions
+      }
+      return updated;
+    });
+  };
+
+  // Global keyboard shortcut listener for Alt + L
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.altKey && (e.key === 'l' || e.key === 'L' || e.code === 'KeyL')) {
+        e.preventDefault();
+        setIsLaunchManagerOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Page routing: 'home' vs 'team' vs 'contact' (Separate clean paths: /, /team, /contact)
+  const [currentPage, setCurrentPage] = useState<'home' | 'team' | 'contact'>(() => {
+    if (typeof window !== 'undefined') {
+      const rawHash = window.location.hash.toLowerCase().replace(/^#\/?/, '');
+      const path = window.location.pathname.toLowerCase().replace(/\/$/, '') || '/';
+      if (rawHash === 'team' || path === '/team') {
+        return 'team';
+      }
+      if (rawHash === 'contact' || path === '/contact') {
+        return 'contact';
+      }
+    }
+    return 'home';
+  });
+
   // Modal states
   const [isConsultationOpen, setIsConsultationOpen] = useState(false);
   const [consultationServicePrefill, setConsultationServicePrefill] = useState('');
   const [consultationTitle, setConsultationTitle] = useState('Get Free Consultation');
 
   const [selectedService, setSelectedService] = useState<ServiceData | null>(null);
-  const [selectedProject, setSelectedProject] = useState<ProjectData | null>(null);
 
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
+
+  // Synchronize URL clean paths with page state and handle legacy hashes
+  useEffect(() => {
+    // 1. Immediately convert any legacy hash URLs to clean paths (e.g., /#about -> /about)
+    const rawHash = window.location.hash.toLowerCase().replace(/^#\/?/, '');
+    if (rawHash) {
+      const cleanPath = rawHash === 'home' ? '/' : `/${rawHash}`;
+      window.history.replaceState(null, '', cleanPath);
+    }
+
+    const syncRouteFromLocation = () => {
+      const path = window.location.pathname.toLowerCase().replace(/\/$/, '') || '/';
+      if (path === '/team') {
+        setCurrentPage('team');
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      } else if (path === '/contact') {
+        setCurrentPage('contact');
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      } else {
+        setCurrentPage('home');
+        if (path === '/about') {
+          setTimeout(() => {
+            const el = document.getElementById('about');
+            if (el) {
+              const offset = 80;
+              const elementPosition = el.getBoundingClientRect().top + window.pageYOffset;
+              window.scrollTo({ top: elementPosition - offset, behavior: 'smooth' });
+            }
+          }, 120);
+        } else if (path === '/services') {
+          setTimeout(() => {
+            const el = document.getElementById('services');
+            if (el) {
+              const offset = 80;
+              const elementPosition = el.getBoundingClientRect().top + window.pageYOffset;
+              window.scrollTo({ top: elementPosition - offset, behavior: 'smooth' });
+            }
+          }, 120);
+        }
+      }
+    };
+
+    // Run on mount
+    syncRouteFromLocation();
+
+    // Listen for browser Back/Forward navigation
+    window.addEventListener('popstate', syncRouteFromLocation);
+    return () => {
+      window.removeEventListener('popstate', syncRouteFromLocation);
+    };
+  }, []);
+
+  // Navigation handlers (clean path pushState, zero hashes)
+  const navigateToTeam = () => {
+    window.history.pushState({ page: 'team' }, '', '/team');
+    setCurrentPage('team');
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  };
+
+  const navigateToContact = () => {
+    window.history.pushState({ page: 'contact' }, '', '/contact');
+    setCurrentPage('contact');
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  };
+
+  const navigateToHome = (targetSection?: string) => {
+    const cleanPath = targetSection && targetSection !== 'home' ? `/${targetSection}` : '/';
+    window.history.pushState({ page: 'home', section: targetSection }, '', cleanPath);
+    setCurrentPage('home');
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    if (targetSection && targetSection !== 'home') {
+      setTimeout(() => {
+        const el = document.getElementById(targetSection);
+        if (el) {
+          const offset = 80;
+          const elementPosition = el.getBoundingClientRect().top + window.pageYOffset;
+          window.scrollTo({
+            top: elementPosition - offset,
+            behavior: 'smooth',
+          });
+        }
+      }, 100);
+    }
+  };
 
   // Handlers
   const handleOpenConsultation = (serviceTitle?: string, customTitle?: string) => {
@@ -47,16 +203,151 @@ export default function App() {
     setSelectedService(service);
   };
 
-  const handleSelectProject = (project: ProjectData) => {
-    setSelectedProject(project);
-  };
-
-  const handleScrollToWork = () => {
-    const el = document.getElementById('portfolio');
+  const handleScrollToServices = () => {
+    const el = document.getElementById('services');
     if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
+      const offset = 80;
+      const elementPosition = el.getBoundingClientRect().top + window.pageYOffset;
+      window.scrollTo({
+        top: elementPosition - offset,
+        behavior: 'smooth',
+      });
     }
   };
+
+  // Check if Launch Mode is actively blocking the website
+  const effectiveImageUrl = normalizeImageUrl(launchSettings.imageUrl) || DEFAULT_LAUNCH_IMAGE;
+  const isLaunchActive =
+    launchSettings.enabled &&
+    Boolean(effectiveImageUrl) &&
+    launchSettings.targetTimestamp > Date.now() &&
+    !isLaunchSessionUnlocked;
+
+  // If Launch Gate is active: visitors see the custom launch poster & countdown
+  if (isLaunchActive) {
+    return (
+      <div className="relative min-h-screen bg-black">
+        <LaunchCountdownOverlay
+          settings={{ ...launchSettings, imageUrl: effectiveImageUrl }}
+          onUnlock={() => {
+            setIsLaunchSessionUnlocked(true);
+            try {
+              sessionStorage.setItem('shrinath_launch_unlocked', 'true');
+            } catch {
+              // ignore storage restrictions
+            }
+          }}
+          onOpenManager={() => setIsLaunchManagerOpen(true)}
+          onUpdateDragPosition={handleUpdateDragPosition}
+        />
+
+        <LaunchManagerModal
+          isOpen={isLaunchManagerOpen}
+          onClose={() => setIsLaunchManagerOpen(false)}
+          onSettingsUpdated={handleSettingsUpdated}
+          onTriggerPreview={() => {
+            setIsLaunchManagerOpen(false);
+            setShowLaunchPreview(true);
+          }}
+        />
+      </div>
+    );
+  }
+
+  // If on separate Team Page
+  if (currentPage === 'team') {
+    return (
+      <div className="min-h-screen bg-[#FAF9F5] text-slate-900 flex flex-col selection:bg-[#EAB308] selection:text-[#17191C]">
+        <ScrollProgressBar />
+        <CustomCursor />
+
+        <TeamPage
+          onNavigateHome={navigateToHome}
+          onOpenConsultation={handleOpenConsultation}
+          onNavigateContact={navigateToContact}
+          onOpenPrivacy={() => setIsPrivacyOpen(true)}
+          onOpenTerms={() => setIsPrivacyOpen(true)}
+        />
+
+        {/* Interactive Modals */}
+        <ContactModal
+          isOpen={isConsultationOpen}
+          onClose={() => setIsConsultationOpen(false)}
+          initialService={consultationServicePrefill}
+          title={consultationTitle}
+        />
+
+        <PrivacyModal
+          isOpen={isPrivacyOpen}
+          onClose={() => setIsPrivacyOpen(false)}
+        />
+
+        {/* Launch Manager Modal (Alt + L) */}
+        <LaunchManagerModal
+          isOpen={isLaunchManagerOpen}
+          onClose={() => setIsLaunchManagerOpen(false)}
+          onSettingsUpdated={handleSettingsUpdated}
+          onTriggerPreview={() => {
+            setIsLaunchManagerOpen(false);
+            setShowLaunchPreview(true);
+          }}
+        />
+
+        {showLaunchPreview && (
+          <LaunchCountdownOverlay
+            settings={{ ...launchSettings, imageUrl: effectiveImageUrl }}
+            isForcedPreview
+            onClosePreview={() => setShowLaunchPreview(false)}
+            onOpenManager={() => setIsLaunchManagerOpen(true)}
+            onUpdateDragPosition={handleUpdateDragPosition}
+          />
+        )}
+      </div>
+    );
+  }
+
+  // If on separate Contact Page
+  if (currentPage === 'contact') {
+    return (
+      <div className="min-h-screen bg-[#FAF9F5] text-slate-900 flex flex-col selection:bg-[#EAB308] selection:text-[#17191C]">
+        <ScrollProgressBar />
+        <CustomCursor />
+
+        <ContactPage
+          onNavigateHome={navigateToHome}
+          onNavigateTeam={navigateToTeam}
+          onOpenPrivacy={() => setIsPrivacyOpen(true)}
+          onOpenTerms={() => setIsPrivacyOpen(true)}
+        />
+
+        <PrivacyModal
+          isOpen={isPrivacyOpen}
+          onClose={() => setIsPrivacyOpen(false)}
+        />
+
+        {/* Launch Manager Modal (Alt + L) */}
+        <LaunchManagerModal
+          isOpen={isLaunchManagerOpen}
+          onClose={() => setIsLaunchManagerOpen(false)}
+          onSettingsUpdated={handleSettingsUpdated}
+          onTriggerPreview={() => {
+            setIsLaunchManagerOpen(false);
+            setShowLaunchPreview(true);
+          }}
+        />
+
+        {showLaunchPreview && (
+          <LaunchCountdownOverlay
+            settings={{ ...launchSettings, imageUrl: effectiveImageUrl }}
+            isForcedPreview
+            onClosePreview={() => setShowLaunchPreview(false)}
+            onOpenManager={() => setIsLaunchManagerOpen(true)}
+            onUpdateDragPosition={handleUpdateDragPosition}
+          />
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-[#FFD21F] selection:text-[#17191C]">
@@ -69,7 +360,9 @@ export default function App() {
       {/* 1. Top Navbar */}
       <Navbar
         onOpenConsultation={() => handleOpenConsultation(undefined, 'Get Free Consultation')}
-        onOpenContact={() => handleOpenConsultation(undefined, 'Contact Our Team')}
+        onOpenContact={navigateToContact}
+        onNavigateTeam={navigateToTeam}
+        onNavigateContact={navigateToContact}
       />
 
       {/* Main Page Layout */}
@@ -77,7 +370,7 @@ export default function App() {
         {/* 2. Hero Section */}
         <Hero
           onStartProject={() => handleOpenConsultation(undefined, 'Start Your Project')}
-          onViewWork={handleScrollToWork}
+          onExploreServices={handleScrollToServices}
         />
 
         {/* Client Logos / Trusted By Scroll Section */}
@@ -99,17 +392,12 @@ export default function App() {
           <AboutSection onKnowMore={() => setIsAboutOpen(true)} />
         </ScrollSectionReveal>
 
-        {/* 6. Our Work / Recent Projects Section */}
-        <ScrollSectionReveal id="work-section">
-          <WorkSection onSelectProject={handleSelectProject} />
-        </ScrollSectionReveal>
-
-        {/* 7. Testimonials Section */}
+        {/* 6. Testimonials Section */}
         <ScrollSectionReveal id="testimonials-section">
           <TestimonialsSection />
         </ScrollSectionReveal>
 
-        {/* 8. Call to Action Banner */}
+        {/* 7. Call to Action Banner */}
         <ScrollSectionReveal id="cta-section">
           <CtaBanner
             onOpenConsultation={() => handleOpenConsultation(undefined, 'Claim Your Free Consultation')}
@@ -117,21 +405,20 @@ export default function App() {
         </ScrollSectionReveal>
       </main>
 
-      {/* 9. Footer */}
+      {/* 8. Footer */}
       <ScrollSectionReveal id="footer-section">
         <Footer
           onOpenPrivacy={() => setIsPrivacyOpen(true)}
           onOpenTerms={() => setIsPrivacyOpen(true)}
-          onOpenContact={() => handleOpenConsultation(undefined, 'Get In Touch')}
+          onOpenContact={navigateToContact}
+          onNavigateTeam={navigateToTeam}
+          onNavigateContact={navigateToContact}
+          onOpenLaunchManager={() => setIsLaunchManagerOpen(true)}
         />
       </ScrollSectionReveal>
 
       {/* Floating Action Buttons */}
       <BackToTopButton scrollThreshold={500} />
-      <WhatsAppFloatingButton
-        onOpenContact={() => handleOpenConsultation(undefined, 'WhatsApp Priority Inquiry')}
-        phoneNumber="7972865688"
-      />
 
       {/* Interactive Modals */}
       <ContactModal
@@ -150,15 +437,6 @@ export default function App() {
         }}
       />
 
-      <ProjectModal
-        project={selectedProject}
-        onClose={() => setSelectedProject(null)}
-        onDiscussSimilar={(projectName) => {
-          setSelectedProject(null);
-          handleOpenConsultation(undefined, `Build Similar: ${projectName}`);
-        }}
-      />
-
       <AboutModal
         isOpen={isAboutOpen}
         onClose={() => setIsAboutOpen(false)}
@@ -172,6 +450,28 @@ export default function App() {
         isOpen={isPrivacyOpen}
         onClose={() => setIsPrivacyOpen(false)}
       />
+
+      {/* Launch Manager Modal (Alt + L) */}
+      <LaunchManagerModal
+        isOpen={isLaunchManagerOpen}
+        onClose={() => setIsLaunchManagerOpen(false)}
+        onSettingsUpdated={handleSettingsUpdated}
+        onTriggerPreview={() => {
+          setIsLaunchManagerOpen(false);
+          setShowLaunchPreview(true);
+        }}
+      />
+
+      {/* Launch Countdown Preview Overlay if triggered */}
+      {showLaunchPreview && (
+        <LaunchCountdownOverlay
+          settings={{ ...launchSettings, imageUrl: effectiveImageUrl }}
+          isForcedPreview
+          onClosePreview={() => setShowLaunchPreview(false)}
+          onOpenManager={() => setIsLaunchManagerOpen(true)}
+          onUpdateDragPosition={handleUpdateDragPosition}
+        />
+      )}
     </div>
   );
 }
