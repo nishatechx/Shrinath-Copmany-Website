@@ -20,67 +20,8 @@ import { PrivacyModal } from './components/PrivacyModal';
 import { BackToTopButton } from './components/BackToTopButton';
 import { CustomCursor } from './components/CustomCursor';
 import { ScrollProgressBar } from './components/ScrollProgressBar';
-import { LaunchCountdownOverlay } from './components/LaunchCountdownOverlay';
-import {
-  LaunchManagerModal,
-  LaunchSettings,
-  getSavedLaunchSettings,
-  LAUNCH_STORAGE_KEY,
-} from './components/LaunchManagerModal';
-import { normalizeImageUrl, DEFAULT_LAUNCH_IMAGE } from './utils/imageUrl';
 
 export default function App() {
-  // Launch management settings & state
-  const [launchSettings, setLaunchSettings] = useState<LaunchSettings>(() =>
-    getSavedLaunchSettings()
-  );
-  const [isLaunchManagerOpen, setIsLaunchManagerOpen] = useState<boolean>(false);
-  const [showLaunchPreview, setShowLaunchPreview] = useState<boolean>(false);
-  const [isLaunchSessionUnlocked, setIsLaunchSessionUnlocked] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      return sessionStorage.getItem('shrinath_launch_unlocked') === 'true';
-    }
-    return false;
-  });
-
-  // Handler for updated launch settings ("make it happen")
-  const handleSettingsUpdated = (newSettings: LaunchSettings) => {
-    setLaunchSettings(newSettings);
-    if (newSettings.enabled) {
-      setIsLaunchSessionUnlocked(false);
-      try {
-        sessionStorage.removeItem('shrinath_launch_unlocked');
-      } catch {
-        // ignore storage restrictions
-      }
-    }
-  };
-
-  // Handler for updating dragged countdown position coordinates
-  const handleUpdateDragPosition = (pos: { x: number; y: number }) => {
-    setLaunchSettings((prev) => {
-      const updated: LaunchSettings = { ...prev, dragPosition: pos };
-      try {
-        localStorage.setItem(LAUNCH_STORAGE_KEY, JSON.stringify(updated));
-      } catch {
-        // ignore storage restrictions
-      }
-      return updated;
-    });
-  };
-
-  // Global keyboard shortcut listener for Alt + L
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.altKey && (e.key === 'l' || e.key === 'L' || e.code === 'KeyL')) {
-        e.preventDefault();
-        setIsLaunchManagerOpen((prev) => !prev);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
   // Page routing: 'home' vs 'team' vs 'contact' (Separate clean paths: /, /team, /contact)
   const [currentPage, setCurrentPage] = useState<'home' | 'team' | 'contact'>(() => {
     if (typeof window !== 'undefined') {
@@ -215,45 +156,6 @@ export default function App() {
     }
   };
 
-  // Check if Launch Mode is actively blocking the website
-  const effectiveImageUrl = normalizeImageUrl(launchSettings.imageUrl) || DEFAULT_LAUNCH_IMAGE;
-  const isLaunchActive =
-    launchSettings.enabled &&
-    Boolean(effectiveImageUrl) &&
-    launchSettings.targetTimestamp > Date.now() &&
-    !isLaunchSessionUnlocked;
-
-  // If Launch Gate is active: visitors see the custom launch poster & countdown
-  if (isLaunchActive) {
-    return (
-      <div className="relative min-h-screen bg-black">
-        <LaunchCountdownOverlay
-          settings={{ ...launchSettings, imageUrl: effectiveImageUrl }}
-          onUnlock={() => {
-            setIsLaunchSessionUnlocked(true);
-            try {
-              sessionStorage.setItem('shrinath_launch_unlocked', 'true');
-            } catch {
-              // ignore storage restrictions
-            }
-          }}
-          onOpenManager={() => setIsLaunchManagerOpen(true)}
-          onUpdateDragPosition={handleUpdateDragPosition}
-        />
-
-        <LaunchManagerModal
-          isOpen={isLaunchManagerOpen}
-          onClose={() => setIsLaunchManagerOpen(false)}
-          onSettingsUpdated={handleSettingsUpdated}
-          onTriggerPreview={() => {
-            setIsLaunchManagerOpen(false);
-            setShowLaunchPreview(true);
-          }}
-        />
-      </div>
-    );
-  }
-
   // If on separate Team Page
   if (currentPage === 'team') {
     return (
@@ -281,27 +183,6 @@ export default function App() {
           isOpen={isPrivacyOpen}
           onClose={() => setIsPrivacyOpen(false)}
         />
-
-        {/* Launch Manager Modal (Alt + L) */}
-        <LaunchManagerModal
-          isOpen={isLaunchManagerOpen}
-          onClose={() => setIsLaunchManagerOpen(false)}
-          onSettingsUpdated={handleSettingsUpdated}
-          onTriggerPreview={() => {
-            setIsLaunchManagerOpen(false);
-            setShowLaunchPreview(true);
-          }}
-        />
-
-        {showLaunchPreview && (
-          <LaunchCountdownOverlay
-            settings={{ ...launchSettings, imageUrl: effectiveImageUrl }}
-            isForcedPreview
-            onClosePreview={() => setShowLaunchPreview(false)}
-            onOpenManager={() => setIsLaunchManagerOpen(true)}
-            onUpdateDragPosition={handleUpdateDragPosition}
-          />
-        )}
       </div>
     );
   }
@@ -324,27 +205,6 @@ export default function App() {
           isOpen={isPrivacyOpen}
           onClose={() => setIsPrivacyOpen(false)}
         />
-
-        {/* Launch Manager Modal (Alt + L) */}
-        <LaunchManagerModal
-          isOpen={isLaunchManagerOpen}
-          onClose={() => setIsLaunchManagerOpen(false)}
-          onSettingsUpdated={handleSettingsUpdated}
-          onTriggerPreview={() => {
-            setIsLaunchManagerOpen(false);
-            setShowLaunchPreview(true);
-          }}
-        />
-
-        {showLaunchPreview && (
-          <LaunchCountdownOverlay
-            settings={{ ...launchSettings, imageUrl: effectiveImageUrl }}
-            isForcedPreview
-            onClosePreview={() => setShowLaunchPreview(false)}
-            onOpenManager={() => setIsLaunchManagerOpen(true)}
-            onUpdateDragPosition={handleUpdateDragPosition}
-          />
-        )}
       </div>
     );
   }
@@ -413,7 +273,6 @@ export default function App() {
           onOpenContact={navigateToContact}
           onNavigateTeam={navigateToTeam}
           onNavigateContact={navigateToContact}
-          onOpenLaunchManager={() => setIsLaunchManagerOpen(true)}
         />
       </ScrollSectionReveal>
 
@@ -450,28 +309,6 @@ export default function App() {
         isOpen={isPrivacyOpen}
         onClose={() => setIsPrivacyOpen(false)}
       />
-
-      {/* Launch Manager Modal (Alt + L) */}
-      <LaunchManagerModal
-        isOpen={isLaunchManagerOpen}
-        onClose={() => setIsLaunchManagerOpen(false)}
-        onSettingsUpdated={handleSettingsUpdated}
-        onTriggerPreview={() => {
-          setIsLaunchManagerOpen(false);
-          setShowLaunchPreview(true);
-        }}
-      />
-
-      {/* Launch Countdown Preview Overlay if triggered */}
-      {showLaunchPreview && (
-        <LaunchCountdownOverlay
-          settings={{ ...launchSettings, imageUrl: effectiveImageUrl }}
-          isForcedPreview
-          onClosePreview={() => setShowLaunchPreview(false)}
-          onOpenManager={() => setIsLaunchManagerOpen(true)}
-          onUpdateDragPosition={handleUpdateDragPosition}
-        />
-      )}
     </div>
   );
 }

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { X, Send, CheckCircle2, Phone, Mail, MapPin } from 'lucide-react';
+import { X, Send, CheckCircle2, Phone, Mail, MapPin, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SERVICES_LIST } from './ServicesSection';
 import { PREMIUM_EASE } from '../hooks/useMotionConfig';
+import { submitToFormspree } from '../utils/formspree';
 
 interface ContactModalProps {
   isOpen: boolean;
@@ -28,20 +29,36 @@ export const ContactModal: React.FC<ContactModalProps> = ({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setErrorMessage(null);
 
-    // Simulate fast submission & WhatsApp link generation
-    setTimeout(() => {
-      setIsSubmitting(false);
+    const res = await submitToFormspree({
+      name: formData.name,
+      phone: formData.phone,
+      email: formData.email,
+      service: formData.service,
+      businessName: formData.businessName,
+      message: formData.message,
+      source: 'Consultation Modal Form',
+      _subject: `New Consultation Request: ${formData.service} from ${formData.name} (${formData.phone})`,
+    });
+
+    setIsSubmitting(false);
+
+    if (res.success) {
       setIsSuccess(true);
-    }, 600);
+    } else {
+      setErrorMessage(res.error || 'Failed to submit form. Please check your connection or contact us on WhatsApp.');
+    }
   };
 
   const handleReset = () => {
     setIsSuccess(false);
+    setErrorMessage(null);
     setFormData({
       name: '',
       email: '',
@@ -148,6 +165,26 @@ export const ContactModal: React.FC<ContactModalProps> = ({
               </a>
             </div>
 
+            {errorMessage && (
+              <div className="mb-4 p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-start gap-2.5">
+                <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5 text-red-400" />
+                <div className="flex-1">
+                  <p className="font-semibold">{errorMessage}</p>
+                  <p className="text-slate-400 text-[11px] mt-1">
+                    You can also connect with us instantly on WhatsApp at{' '}
+                    <a
+                      href="https://wa.me/917972865688"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline text-amber-400 font-semibold"
+                    >
+                      +91 79728 65688
+                    </a>
+                  </p>
+                </div>
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -156,6 +193,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({
                   </label>
                   <input
                     type="text"
+                    name="name"
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -170,6 +208,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({
                   </label>
                   <input
                     type="tel"
+                    name="phone"
                     required
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
@@ -186,6 +225,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({
                   </label>
                   <input
                     type="text"
+                    name="businessName"
                     value={formData.businessName}
                     onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
                     placeholder="e.g. Washim Electronics"
@@ -198,6 +238,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({
                     Service Required
                   </label>
                   <select
+                    name="service"
                     value={formData.service}
                     onChange={(e) => setFormData({ ...formData, service: e.target.value })}
                     className="w-full px-3.5 py-2.5 rounded-lg bg-slate-900 border border-slate-800 text-white text-sm focus:outline-none focus:border-[#EAB308]"
@@ -217,6 +258,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({
                 </label>
                 <input
                   type="email"
+                  name="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder="name@example.com"
@@ -230,6 +272,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({
                 </label>
                 <textarea
                   rows={3}
+                  name="message"
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   placeholder="Tell us what you want to achieve or any specific features you need..."

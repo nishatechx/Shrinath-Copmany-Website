@@ -59,6 +59,14 @@ const TEAM_MEMBERS: TeamMember[] = [
     cropTouch: 'both', // Cropped from both sides: cards touch from both sides
   },
   {
+    id: 'dinesh-katarmal',
+    name: 'Dinesh Katarmal',
+    role: 'Marketing Head',
+    description: 'Leading strategic market expansion, brand partnerships, and result-oriented growth initiatives.',
+    image: 'https://blogger.googleusercontent.com/img/a/AVvXsEhmMDByOtOtSDgCj7MunyGQgkLiXalKbj2H5E2ES5GqYInoEiN4qG2YunVybcQ1Kg8B0sD1EA44UTbgvQL89Yg8zqATMVj4KtllF9ozFxEGK-yk1v2dnprtKv-dXxL3Rczpna5Ys0AuKa2pcrvEgd57jymkRQ7zTAbI0a5vjM0J_myH59kMr17-LU1GR-o',
+    cropTouch: 'both',
+  },
+  {
     id: 'rushali-babhane',
     name: 'Rushali Babhane',
     role: 'HR Manager',
@@ -386,16 +394,15 @@ export const TeamPage: React.FC<TeamPageProps> = ({
       {/* =========================================================================
           3. "MEET OUR TEAM" / "OUR EXPERT TEAM" (8 Team Cards)
       ========================================================================= */}
-      <section className="relative py-16 bg-[#FAF9F5] overflow-hidden">
-        {/* User-requested Team Section Background Image */}
+      <section id="our-expert-team" className="relative py-16 sm:py-20 lg:py-24 bg-[#FAF9F5] overflow-hidden">
+        {/* User-requested Team Section Background Image - Perfect Fit */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
           <img
             src="https://blogger.googleusercontent.com/img/a/AVvXsEjPNeP2csxfvk7lsiqYg3DLwIqieLVbLfZeCfTZc9tfSK-90-NGa6vgkmoeSDa6yrOZ-Mgz5u7r7DPi5YAlD8v-t8CSjgTl9FnXfFvcwe_xBii_RgyF9QGAXfRww-PWo7Tmf24p5jNEfqjPy0VU0sy_2LE08xHwobkzXV3GZFti-rUUl648xmFP7Q7dbrg=s1600"
-            alt="Shrinath IT Team Background"
-            className="w-full h-full object-cover object-center opacity-25"
+            alt="Our Expert Team Background"
+            className="w-full h-full object-cover object-center"
             referrerPolicy="no-referrer"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#FAF9F5]/90 via-[#FAF9F5]/80 to-[#FAF9F5]/95" />
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -423,14 +430,14 @@ export const TeamPage: React.FC<TeamPageProps> = ({
           {/* Minimal Team Cards Grid (2 in each row, cards touch cropped images from both sides or right side for Shrinath, 50% image protrusion, flush bottom) */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 lg:gap-x-8 gap-y-24 sm:gap-y-28 max-w-6xl mx-auto items-end">
             {TEAM_MEMBERS.map((member, index) => {
-              const isFifth = index === 4;
+              const isOddLast = TEAM_MEMBERS.length % 2 !== 0 && index === TEAM_MEMBERS.length - 1;
               const touchesBoth = member.cropTouch === 'both';
               const touchesRight = member.cropTouch === 'right';
 
               return (
                 <div
                   key={member.id}
-                  className={`pt-24 sm:pt-28 ${isFifth ? 'md:col-span-2 md:max-w-[calc(50%-0.75rem)] lg:max-w-[calc(50%-1rem)] md:mx-auto w-full' : 'w-full'}`}
+                  className={`pt-24 sm:pt-28 ${isOddLast ? 'md:col-span-2 md:max-w-[calc(50%-0.75rem)] lg:max-w-[calc(50%-1rem)] md:mx-auto w-full' : 'w-full'}`}
                 >
                   <div className="relative bg-[#111315] rounded-2xl border border-neutral-800 shadow-md flex flex-row items-stretch min-h-[125px] sm:min-h-[135px]">
                     
@@ -808,32 +815,6 @@ export const TeamPage: React.FC<TeamPageProps> = ({
                   <a href="mailto:shrinathit.in@gmail.com" className="hover:text-[#EAB308] transition-colors">
                     shrinathit.in@gmail.com
                   </a>
-                </div>
-              </div>
-
-              {/* India Map Silhouette & "Proudly Serving Washim & Nearby Businesses" Card */}
-              <div className="mt-4 p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center space-x-3.5">
-                {/* Silhouette map */}
-                <div className="relative w-11 h-11 flex-shrink-0">
-                  <svg viewBox="0 0 100 100" className="w-full h-full text-amber-500/80 fill-current">
-                    {/* Stylized India/Maharashtra contour */}
-                    <path d="M 45,10 Q 55,8 60,18 Q 62,30 75,38 Q 85,50 68,65 Q 55,85 48,92 Q 40,85 30,70 Q 20,55 28,40 Q 32,25 45,10 Z" />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#EAB308] shadow-[0_0_8px_#EAB308] animate-pulse" />
-                  </div>
-                </div>
-
-                <div>
-                  <p className="text-xs font-bold text-white leading-tight">
-                    Proudly Serving
-                  </p>
-                  <p className="text-xs font-extrabold text-[#EAB308] leading-tight">
-                    Washim & Nearby
-                  </p>
-                  <p className="text-[11px] text-slate-400 leading-tight">
-                    Businesses
-                  </p>
                 </div>
               </div>
 

@@ -16,10 +16,12 @@ import {
   Instagram,
   Facebook,
   Youtube,
-  Linkedin
+  Linkedin,
+  AlertCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { PREMIUM_EASE } from '../hooks/useMotionConfig';
+import { submitToFormspree } from '../utils/formspree';
 
 interface ContactPageProps {
   onNavigateHome: (section?: string) => void;
@@ -60,6 +62,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
@@ -71,18 +74,33 @@ export const ContactPage: React.FC<ContactPageProps> = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setErrorMessage(null);
 
-    setTimeout(() => {
-      setIsSubmitting(false);
+    const res = await submitToFormspree({
+      name: formData.name,
+      phone: formData.phone,
+      email: formData.email,
+      service: formData.service,
+      message: formData.message,
+      source: 'Contact Page Form',
+      _subject: `Contact Page Inquiry: ${formData.service} from ${formData.name} (${formData.phone})`,
+    });
+
+    setIsSubmitting(false);
+
+    if (res.success) {
       setIsSuccess(true);
-    }, 600);
+    } else {
+      setErrorMessage(res.error || 'Failed to submit your message. Please check your connection or send a WhatsApp message.');
+    }
   };
 
   const handleReset = () => {
     setIsSuccess(false);
+    setErrorMessage(null);
     setFormData({
       name: '',
       phone: '',
@@ -337,6 +355,25 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-5">
+                  {errorMessage && (
+                    <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-start gap-2.5">
+                      <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5 text-red-600" />
+                      <div className="flex-1">
+                        <p className="font-semibold">{errorMessage}</p>
+                        <p className="text-slate-600 text-[11px] mt-1">
+                          You can also reach our team immediately on WhatsApp at{' '}
+                          <a
+                            href="https://wa.me/917972865688"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="underline text-amber-700 font-semibold"
+                          >
+                            +91 79728 65688
+                          </a>
+                        </p>
+                      </div>
+                    </div>
+                  )}
                   
                   {/* Name & Phone in 2 cols */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -346,6 +383,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                       </label>
                       <input
                         id="contact-name"
+                        name="name"
                         type="text"
                         required
                         value={formData.name}
@@ -361,6 +399,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                       </label>
                       <input
                         id="contact-phone"
+                        name="phone"
                         type="tel"
                         required
                         value={formData.phone}
@@ -379,6 +418,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                       </label>
                       <input
                         id="contact-email"
+                        name="email"
                         type="email"
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -393,6 +433,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                       </label>
                       <select
                         id="contact-service"
+                        name="service"
                         value={formData.service}
                         onChange={(e) => setFormData({ ...formData, service: e.target.value })}
                         className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-sm focus:outline-hidden focus:bg-white focus:border-[#EAB308] focus:ring-2 focus:ring-[#EAB308]/20 transition-all cursor-pointer"
@@ -413,6 +454,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                     </label>
                     <textarea
                       id="contact-message"
+                      name="message"
                       rows={4}
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}

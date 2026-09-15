@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { Logo } from './Logo';
-import { MapPin, Phone, Mail, Instagram, Facebook, Youtube, Linkedin, MessageCircle, ArrowUp, Globe, Lock } from 'lucide-react';
+import { MapPin, Phone, Mail, Instagram, Facebook, Youtube, Linkedin, MessageCircle, ArrowUp, Globe } from 'lucide-react';
 import { motion, useInView } from 'motion/react';
 import { PREMIUM_EASE, useMotionSettings } from '../hooks/useMotionConfig';
 interface FooterProps {
@@ -9,7 +9,6 @@ interface FooterProps {
   onOpenContact?: () => void;
   onNavigateTeam?: () => void;
   onNavigateContact?: () => void;
-  onOpenLaunchManager?: () => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({
@@ -18,7 +17,6 @@ export const Footer: React.FC<FooterProps> = ({
   onOpenContact,
   onNavigateTeam,
   onNavigateContact,
-  onOpenLaunchManager,
 }) => {
   const footerRef = useRef<HTMLElement>(null);
   const isInView = useInView(footerRef, { once: true, margin: '-40px' });
@@ -279,29 +277,6 @@ export const Footer: React.FC<FooterProps> = ({
               </div>
             </div>
 
-            {/* Map Silhouette & Proudly Serving Washim Graphic */}
-            <div className="mt-6 p-4 rounded-xl bg-slate-900/80 border border-slate-800/80 flex items-center space-x-4">
-              {/* Stylized Maharashtra / Washim District Outline */}
-              <div className="relative w-14 h-14 flex-shrink-0">
-                <svg
-                  viewBox="0 0 100 100"
-                  className="w-full h-full text-slate-700 fill-current opacity-80"
-                >
-                  <path d="M 20,30 Q 35,15 65,20 T 90,45 Q 85,75 60,85 T 25,80 Q 15,60 20,30 Z" />
-                  <path d="M 45,45 Q 55,40 65,48 T 58,62 Q 48,60 45,45 Z" fill="#334155" />
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <MapPin className="w-5 h-5 text-[#EAB308] fill-[#EAB308] drop-shadow-md" />
-                </div>
-              </div>
-
-              <div>
-                <p className="text-xs font-semibold text-slate-400">Proudly Serving</p>
-                <p className="text-sm font-extrabold text-white">Washim</p>
-                <p className="text-[11px] text-slate-400">and Nearby Areas</p>
-              </div>
-            </div>
-
           </motion.div>
 
         </div>
@@ -330,20 +305,6 @@ export const Footer: React.FC<FooterProps> = ({
             <span className="hover:text-slate-200 transition-colors cursor-pointer">
               Sitemap
             </span>
-            {onOpenLaunchManager && (
-              <>
-                <span>|</span>
-                <button
-                  type="button"
-                  onClick={onOpenLaunchManager}
-                  title="Launch Settings (Alt + L)"
-                  className="text-slate-500 hover:text-amber-400 transition-colors cursor-pointer inline-flex items-center gap-1"
-                >
-                  <Lock className="w-3 h-3" />
-                  <span>Launch Portal (Alt+L)</span>
-                </button>
-              </>
-            )}
           </div>
 
           <div className="flex items-center gap-4">
